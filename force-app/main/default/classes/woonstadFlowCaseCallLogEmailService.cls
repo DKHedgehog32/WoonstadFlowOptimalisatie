@@ -14,6 +14,7 @@
  * - Sends email using a provided template.
  * - Logs email confirmation as a ContentVersion linked to the Case.
  * - Updates the Case status to 'Closed' after successful processing.
+ * - Copies Label__c from Account to Case.
  */
 public with sharing class woonstadFlowCaseCallLogEmailService {
     
@@ -69,14 +70,15 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                     }
                 }
 
-                // Fetch Account data
+                // Fetch Account data (added Label__c)
                 Account acc = [
                     SELECT Id, Name, PersonEmail,
                            Full_Shipping_Street__c,
                            Full_Shipping_Postal_Code__c,
                            Full_Shipping_City__c,
                            Full_Shipping_Country__c,
-                           IsPersonAccount, PersonContactId
+                           IsPersonAccount, PersonContactId,
+                           Label__c
                     FROM Account
                     WHERE Id = :req.accountId
                     LIMIT 1
@@ -93,7 +95,7 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
 
                 Id runningUserId = UserInfo.getUserId();
 
-                // 1. Create Case
+                // 1. Create Case (now also populating Label__c)
                 Case c = new Case(
                     Subject = subjectText,
                     Description = descriptionText,
@@ -101,6 +103,7 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                     AccountId = req.accountId,
                     Origin = req.caseOrigin,
                     Nameplate_Text__c = req.nameplateText,
+                    Label__c = acc.Label__c,
                     Status = 'New'
                 );
                 insert c;

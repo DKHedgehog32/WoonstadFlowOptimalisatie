@@ -5,14 +5,12 @@
     Date: 2025-07-31
     Description:
     Legacy-style template for the WoonstadFlowQuickAction LWC.
-    - Renders the Flow "Screen_Flow_Create_Update_New_Case_V2"
-      only when recordId is available.
-    - Shows a loading message until recordId is ready.
+    Uses wired CurrentPageReference to capture recordId early.
 -->
 
 <template>
     <lightning-card title="Nieuwe Zaak">
-        <!-- Render Flow only if recordId is available -->
+        <!-- Show Flow only when recordId is ready -->
         <template if:true={ready}>
             <div class="flow-container">
                 <lightning-flow

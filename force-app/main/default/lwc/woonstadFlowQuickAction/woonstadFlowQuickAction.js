@@ -4,45 +4,55 @@
  * =============================================
  * Date: 2025-07-31
  * Description:
- * Legacy-style Lightning Web Component for a Quick Action.
- * Uses conditional rendering so the Flow only starts once
- * recordId is available, preventing undefined errors.
+ * Legacy-style Lightning Web Component Quick Action.
+ * Uses wired CurrentPageReference to fetch recordId early.
+ * Ensures the Flow only loads once recordId is available.
  */
 
-import { LightningElement, api, track } from 'lwc';
+import { LightningElement, api, track, wire } from 'lwc';
+import { CurrentPageReference } from 'lightning/navigation';
 
 export default class WoonstadFlowQuickAction extends LightningElement {
     // Backing field for recordId
     _recordId;
 
-    // Track readiness of the record context
+    // Track readiness of record context
     @track ready = false;
 
     /**
-     * Setter for recordId: called when Salesforce injects the recordId.
-     * Marks the component as ready when a valid value is received.
+     * recordId setter: called when Salesforce injects the recordId.
      */
     @api
     set recordId(value) {
-        this._recordId = value;
         if (value) {
+            this._recordId = value;
             this.ready = true;
             console.log('recordId set via setter:', value);
-        } else {
-            console.warn('recordId setter received undefined.');
         }
     }
 
     /**
-     * Getter for recordId: returns the backing field.
+     * Getter for recordId.
      */
     get recordId() {
         return this._recordId;
     }
 
     /**
-     * Provides input variables for the Flow.
-     * Only returns a value when recordId is ready.
+     * Wired page reference: fallback to extract recordId
+     * if not already set by Salesforce injection.
+     */
+    @wire(CurrentPageReference)
+    wiredPageRef(pageRef) {
+        if (pageRef && pageRef.state && pageRef.state.recordId && !this._recordId) {
+            this._recordId = pageRef.state.recordId;
+            this.ready = true;
+            console.log('recordId retrieved via CurrentPageReference:', this._recordId);
+        }
+    }
+
+    /**
+     * Getter: Provides Flow input variables.
      */
     get flowInputs() {
         if (this.ready && this._recordId) {
@@ -59,7 +69,7 @@ export default class WoonstadFlowQuickAction extends LightningElement {
     }
 
     /**
-     * Handles Flow status changes and closes the Quick Action modal when finished.
+     * Handles Flow status changes and closes the modal when finished.
      */
     handleStatusChange(event) {
         const status = event.detail.status;

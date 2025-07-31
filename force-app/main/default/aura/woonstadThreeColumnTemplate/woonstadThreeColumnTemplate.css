@@ -1,0 +1,33 @@
+/* Remove background from the entire row layout */
+.THIS .ws-row {
+    background: transparent !important;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Remove background from individual column containers */
+.THIS .ws-left,
+.THIS .ws-main,
+.THIS .ws-right {
+    padding: 0.5rem;
+    background: transparent;
+}
+
+/* Only apply card styling to known non-LWC elements by class */
+.THIS .ws-left > .ws-card,
+.THIS .ws-main > .ws-card,
+.THIS .ws-right > .ws-card {
+    border-radius: 12px;
+    background: var(--ws-blue-50);
+    border: 1px solid var(--ws-blue-100);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Make sure content inside main column doesn’t overflow */
+.THIS .ws-main > div {
+    min-width: 0;
+}

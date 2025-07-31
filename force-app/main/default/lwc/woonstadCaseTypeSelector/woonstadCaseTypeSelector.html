@@ -1,0 +1,23 @@
+<!-- 
+    =============================================
+    Woonstad Case Type Selector Template
+    =============================================
+    Date: 2025-07-31
+    Last Changed: 2025-07-31
+    Description:
+    Lightning Web Component template for selecting 
+    a Case Type. The picklist values are dynamically 
+    provided from Apex (filtered by Record Type).
+-->
+
+<template>
+    <!-- Lightning Combobox displaying Case.Type picklist -->
+    <lightning-combobox
+        name="caseType"
+        label="Case Type"
+        placeholder="Select a type"
+        options={picklistOptions}
+        value={selectedValue}
+        onchange={handleChange}>
+    </lightning-combobox>
+</template>

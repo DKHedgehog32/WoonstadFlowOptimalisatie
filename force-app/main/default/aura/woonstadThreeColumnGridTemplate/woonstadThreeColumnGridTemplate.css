@@ -1,0 +1,26 @@
+.THIS.ws-template {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #f4f6f9;
+    padding: 1rem;
+    gap: 1rem;
+    box-sizing: border-box;
+}
+
+.THIS.ws-header {
+    background: #0061cd;
+    color: white;
+    padding: 1rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+.THIS.ws-columns {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}

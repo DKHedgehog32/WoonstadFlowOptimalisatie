@@ -1,0 +1,60 @@
+/* =============================================
+   Woonstad Flow Choice Buttons Stylesheet
+   =============================================
+   Date: 2025-07-31
+   Last Changed: 2025-07-31
+   Description:
+   Styles for the Woonstad Flow Choice Buttons LWC.
+   Provides two large, pill-shaped buttons styled 
+   with Woonstad branding colors.
+*/
+
+/* Container for both choice buttons */
+.button-container {
+    display: flex;
+    gap: 2rem;              /* spacing between buttons */
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+/* Shared styling for both buttons */
+.choice-button {
+    background-color: #85e3f9; /* Woonstad light blue */
+    border-radius: 16px;
+    width: 260px;
+    height: 180px;            /* taller to fit bigger icons */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    text-align: center;
+    padding: 1rem;
+}
+
+/* Hover state: subtle lift effect */
+.choice-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Wrapper for SVG icons inside the button */
+.icon-wrapper {
+    margin-bottom: 1rem;
+}
+
+/* Larger, dark-blue icons */
+.icon-wrapper svg {
+    width: 40px;
+    height: 40px;
+    fill: #00215B; /* Woonstad dark blue */
+}
+
+/* Text label inside the button */
+.button-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: #003c80; /* Woonstad dark blue */
+}

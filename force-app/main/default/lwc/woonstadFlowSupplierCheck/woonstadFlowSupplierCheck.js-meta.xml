@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    =============================================
+    Woonstad Flow Supplier Check - Meta XML
+    =============================================
+    Date: 2025-07-31
+    Last Changed: 2025-07-31
+    Description:
+    Exposes the WoonstadFlowSupplierCheck LWC for use 
+    in Flow Screens. Allows users to:
+      - View and confirm supplier details.
+      - Update the supplier selection if needed.
+      - Edit the nameplate text before confirming.
+    Provides Flow with the confirmed supplier data 
+    and final nameplate text.
+-->
+
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!-- Latest supported Salesforce API version -->
+    <apiVersion>60.0</apiVersion>
+
+    <!-- Make component available for Flow Screens -->
+    <isExposed>true</isExposed>
+
+    <!-- Supported target: Flow Screen -->
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+
+    <!-- Define Flow input and output properties -->
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+
+            <!-- Input: Account Id used to fetch supplier data -->
+            <property name="recordId" 
+                      type="String" 
+                      role="inputOnly" 
+                      label="Record Id (Account)" />
+
+            <!-- Outputs: Supplier details selected or confirmed -->
+            <property name="selectedSupplierName" 
+                      type="String" 
+                      role="outputOnly" 
+                      label="Selected Supplier Name" />
+            <property name="selectedSupplierEmail" 
+                      type="String" 
+                      role="outputOnly" 
+                      label="Selected Supplier Email" />
+
+            <!-- Input + Output: Nameplate text (editable in Flow) -->
+            <property name="naamplaatjeInput" 
+                      type="String" 
+                      label="Naamplaatje Input" />
+            <property name="naamplaatjeOutput" 
+                      type="String" 
+                      role="outputOnly" 
+                      label="Naamplaatje Output" />
+
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

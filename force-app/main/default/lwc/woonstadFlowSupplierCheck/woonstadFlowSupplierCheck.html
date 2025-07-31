@@ -1,0 +1,84 @@
+<!-- 
+    =============================================
+    Woonstad Flow Supplier Check Template
+    =============================================
+    Date: 2025-07-31
+    Last Changed: 2025-07-31
+    Description:
+    Template for the WoonstadFlowSupplierCheck LWC.
+    Allows Flow users to:
+      - Review prefilled customer and supplier info.
+      - Select a different supplier if needed.
+      - Update the nameplate text before confirming.
+-->
+
+<template>
+    <div class="container">
+
+        <!-- Instructions Block -->
+        <div class="instruction">
+            <p>
+                Controleer hieronder de gegevens voor het aanmaken van de Case en de email naar de Leverancier.
+            </p>
+            <ul>
+                <li>Mocht de leverancier niet juist zijn, kies dan in de dropdown de juiste supplier.</li>
+                <li>Als de naam op het naamplaatje niet klopt, pas deze hieronder aan.</li>
+            </ul>
+            <p>
+                Zijn alle gegevens correct klik dan op bevestigen.
+            </p>
+            <p>
+                Na het bevestigen zal je automatisch worden doorgestuurd naar de aangemaakte zaak.
+            </p>
+        </div>
+
+        <!-- Info Block: Displays current details -->
+        <div class="info-block">
+            <div class="field-row">
+                <span class="field-label">Klant Naam:</span>
+                <span>{klantNaam}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">Eigenaar:</span>
+                <span>{eigenaar}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">Adres:</span>
+                <div class="address-block">
+                    <div>{fullStreet}</div>
+                    <div>{postalCode} {city}</div>
+                </div>
+            </div>
+            <div class="field-row">
+                <span class="field-label">Geselecteerde Leverancier:</span>
+                <span>{selectedSupplierName}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">Naam op het Naamplaatje:</span>
+                <span>{naamplaatjeOutput}</span>
+            </div>
+        </div>
+
+        <!-- Supplier Section: Editable fields -->
+        <div class="supplier-section">
+            <div class="field-row">
+                <span class="field-label">Leverancier wijzigen:</span>
+                <lightning-combobox
+                    name="supplierSelect"
+                    value={selectedSupplier}
+                    options={supplierOptions}
+                    onchange={handleSupplierChange}>
+                </lightning-combobox>
+            </div>
+            <div class="field-row">
+                <span class="field-label">Naam op het Naamplaatje wijzigen:</span>
+                <lightning-input 
+                    type="text"
+                    value={naamplaatjeInput}
+                    onchange={handleNaamplaatjeChange}
+                    placeholder="Voer naam in zoals op het naamplaatje">
+                </lightning-input>
+            </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    =============================================
+    Woonstad Case Timeline - Meta XML
+    =============================================
+    Date: 2025-07-31
+    Last Changed: 2025-07-31
+    Description:
+    Configuration for the Woonstad Case Timeline LWC.
+    - Exposed on Record Pages and App Pages.
+    - Currently scoped to the Account object when placed on Record Pages.
+-->
+
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!-- API version used by this component -->
+    <apiVersion>59.0</apiVersion>
+
+    <!-- Make the component available to admins -->
+    <isExposed>true</isExposed>
+
+    <!-- Supported targets -->
+    <targets>
+        <target>lightning__RecordPage</target>
+        <target>lightning__AppPage</target>
+    </targets>
+
+    <!-- Restrict usage on Record Pages to the Account object -->
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <objects>
+                <object>Account</object>
+            </objects>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

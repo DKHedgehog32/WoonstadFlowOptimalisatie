@@ -1,0 +1,29 @@
+/* =============================================
+   Woonstad Flow Supplier Stylesheet
+   =============================================
+   Date: 2025-07-31
+   Last Changed: 2025-07-31
+   Description:
+   Scoped CSS for the WoonstadFlowSupplier LWC.
+   Styles the supplier information display in a 
+   clean row-based layout with bold labels.
+*/
+
+:host {
+    display: block;
+    width: 100%; /* Ensures component takes full width in Flow screen */
+}
+
+/* Layout each field as a row with vertical alignment */
+.field-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem; /* Consistent spacing between rows */
+}
+
+/* Bold labels with spacing and dark color */
+.field-label {
+    font-weight: bold !important; /* Force bold for emphasis */
+    margin-right: 0.5rem;         /* Space between label and value */
+    color: #000;                  /* Standard dark text for readability */
+}

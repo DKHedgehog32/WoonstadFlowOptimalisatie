@@ -1,0 +1,8 @@
+<design:component>
+    <flexipage:template>
+        <flexipage:region name="header" label="Header" defaultWidth="LARGE"/>
+        <flexipage:region name="left" label="Left Sidebar" defaultWidth="SMALL"/>
+        <flexipage:region name="main" label="Main Content" defaultWidth="LARGE"/>
+        <flexipage:region name="right" label="Right Sidebar" defaultWidth="SMALL"/>
+    </flexipage:template>
+</design:component>

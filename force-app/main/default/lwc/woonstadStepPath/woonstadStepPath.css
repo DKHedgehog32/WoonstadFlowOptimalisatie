@@ -1,0 +1,161 @@
+/* =============================================
+   WoonstadStepPath.css
+   =============================================
+   Date: 2025-07-31
+   Last Changed: 2025-07-31
+   Description:
+   Stylesheet for Woonstad Step Path component.
+   - Displays branded horizontal stepper.
+   - Active/completed/inactive step states.
+   - Tooltip above current step with fade-in effect.
+   ============================================= */
+
+/* =========================
+   Main Container
+   ========================= */
+.step-path-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+/* =========================
+   Step Path Layout
+   ========================= */
+.step-path {
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+}
+
+/* =========================
+   Step Circles
+   ========================= */
+.step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.step-circle.active {
+    background-color: #0061cd; /* Woonstad Blue */
+    color: #ffffff;
+}
+
+.step-circle.inactive {
+    background-color: #d3d3d3;
+    color: #00215B;
+}
+
+.step-circle.completed {
+    background-color: #1b8562; /* Woonstad Green */
+    color: #ffffff;
+}
+
+/* =========================
+   Step Labels
+   ========================= */
+.step-label {
+    font-size: 14px;
+    color: #00215B;
+}
+
+.step-label.active {
+    font-weight: 700;
+}
+
+.step-label.inactive {
+    font-weight: 400;
+}
+
+/* =========================
+   Connecting Line
+   ========================= */
+.step-line {
+    margin-top: 0.5rem;
+    width: 100%;
+    max-width: 800px;
+    height: 1px;
+    background-color: #d9d9d9;
+    z-index: 1;
+}
+
+/* =========================
+   Custom Tooltip
+   ========================= */
+.custom-tooltip {
+    position: absolute;
+    top: -4.5rem; /* above the step */
+    background-color: #003c80; /* Woonstad Dark Blue */
+    color: white;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    min-width: 260px;
+    max-width: 320px;
+    text-align: center;
+    white-space: normal; /* allow wrapping */
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    animation: fadeIn 0.2s ease-in-out;
+    line-height: 1.5;
+    pointer-events: none; /* doesn’t block hover */
+}
+
+.custom-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px;
+    border-style: solid;
+    border-color: #003c80 transparent transparent transparent;
+}
+
+/* =========================
+   Animation
+   ========================= */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================
+   Responsive Enhancements
+   ========================= */
+@media screen and (max-width: 768px) {
+    .step-path {
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .custom-tooltip {
+        top: auto;
+        bottom: -5rem; /* move below step on small screens */
+    }
+
+    .custom-tooltip::after {
+        top: -8px;
+        bottom: auto;
+        border-color: transparent transparent #003c80 transparent;
+    }
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    =============================================
+    Woonstad Flow Supplier - Meta XML
+    =============================================
+    Date: 2025-07-31
+    Last Changed: 2025-07-31
+    Description:
+    Exposes the Woonstad Flow Supplier Lightning 
+    Web Component for use in Flow Screens.
+    Provides supplier details (klantNaam, eigenaar, 
+    supplierName, supplierEmail) based on an Account Id.
+-->
+
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!-- Current Salesforce API version -->
+    <apiVersion>60.0</apiVersion>
+
+    <!-- Expose component to Flow Builder -->
+    <isExposed>true</isExposed>
+
+    <!-- Display name inside Flow Builder -->
+    <masterLabel>Woonstad Flow Supplier</masterLabel>
+
+    <!-- Supported target: Flow Screens -->
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+
+    <!-- Configure Flow properties -->
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <!-- Input: Account Id passed from Flow -->
+            <property name="accountId" type="String" label="Account Id" role="inputOnly"/>
+
+            <!-- Outputs: Supplier information returned to Flow -->
+            <property name="klantNaam" type="String" label="Klant Naam" role="outputOnly"/>
+            <property name="eigenaar" type="String" label="Eigenaar" role="outputOnly"/>
+            <property name="supplierName" type="String" label="Supplier" role="outputOnly"/>
+            <property name="supplierEmail" type="String" label="Supplier Email" role="outputOnly"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

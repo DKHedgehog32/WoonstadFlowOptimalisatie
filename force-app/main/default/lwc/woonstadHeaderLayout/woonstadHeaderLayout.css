@@ -1,0 +1,257 @@
+/* =============================================
+   Woonstad Legacy Header + Flow Modal CSS
+   =============================================
+   Date: 2025-07-31
+   Last Changed: 2025-07-31
+   Description:
+   Stylesheet for WoonstadHeaderLayout LWC.
+   - Blue branded page header
+   - White action bar with rounded button groups
+   - Record field block styling
+   - Custom modal overlay for Flow screen
+   ============================================= */
+
+/* =========================
+   Page Header (Blue Bar)
+   ========================= */
+.woonstad-header-bar {
+  display: flex;
+  align-items: center;
+  background-color: var(--ws-blue-300, #0061cd);
+  padding: 1rem 2rem;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  color: white;
+}
+
+.woonstad-header-logo {
+  height: 32px;
+  margin-right: 1rem;
+}
+
+.woonstad-header-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* =========================
+   Action Bar (White Buttons)
+   ========================= */
+.woonstad-button-bar {
+  background: #ffffff;
+  padding: 0.5rem 2rem;
+  border: 1px solid var(--ws-blue-100, #cee6f9);
+  border-bottom: none;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Follow button (rounded pill) */
+.follow-button {
+  border-radius: 20px !important;
+  margin-right: 0.5rem !important;
+}
+
+/* Base Action Buttons */
+.woonstad-button {
+  background: #ffffff !important;
+  border: 1px solid #d9d9d9 !important;
+  color: #002244 !important;
+  font-weight: 600;
+  border-radius: 0 !important;
+  padding: 0 1rem !important;
+  line-height: 1.875rem !important;
+  min-height: 2rem !important;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+.woonstad-button:hover {
+  background: var(--ws-blue-50, #f2f5fc) !important;
+}
+
+/* Rounded group edges */
+.slds-button-group > .slds-button:first-child {
+  border-top-left-radius: 20px !important;
+  border-bottom-left-radius: 20px !important;
+}
+.slds-button-group > .slds-button:last-of-type,
+.slds-button-group > .slds-button_last button {
+  border-top-right-radius: 20px !important;
+  border-bottom-right-radius: 20px !important;
+}
+.slds-button-group > .slds-button:not(:first-child) {
+  border-left: 1px solid #d9d9d9 !important;
+}
+
+/* More Actions Dropdown Menu Styling */
+.woonstad-menu::part(button) {
+  background: #ffffff !important;
+  border: 1px solid #d9d9d9 !important;
+  border-left: 1px solid #d9d9d9 !important;
+  border-radius: 0 20px 20px 0 !important;
+  color: #002244 !important;
+  font-weight: 600;
+  padding: 0 1rem !important;
+  min-height: 2rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================
+   Record Fields Section
+   ========================= */
+.woonstad-record-fields {
+  display: flex;
+  gap: 2rem;
+  padding: 0.75rem 2rem;
+  background: #ffffff;
+  border: 1px solid var(--ws-blue-100, #cee6f9);
+  border-top: none;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  color: #6b6b6b;
+  margin-bottom: 0.15rem;
+}
+
+.field-value {
+  font-size: 1rem;
+  color: var(--ws-text-dark, #002244);
+  font-weight: 500;
+}
+
+/* Email links */
+.field-value.link {
+  color: var(--ws-blue-300, #0061cd);
+  text-decoration: none;
+}
+.field-value.link:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   Flow Modal Styling
+   ========================= */
+.woonstad-flow-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+  z-index: 3000;
+  background: transparent;
+}
+
+/* Backdrop blur effect */
+.slds-backdrop.slds-backdrop_open {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background-color: rgba(0, 0, 0, 0.45);
+  position: fixed;
+  inset: 0;
+  z-index: 2999 !important;
+}
+
+/* Reset Salesforce modal defaults */
+.slds-modal,
+.slds-modal__container,
+.slds-modal__content {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Modal container (white content box) */
+.woonstad-modal__container {
+  background: #ffffff !important;
+  border-radius: 12px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Modal header (blue bar) */
+.woonstad-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--ws-blue-300, #0061cd);
+  color: #ffffff;
+  padding: 1rem 1.5rem;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  width: 100%;
+  position: relative;
+}
+
+.woonstad-modal-header img {
+  position: absolute;
+  left: 1rem;
+  height: 28px;
+}
+
+.woonstad-modal-header .modal-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 auto;
+  flex-grow: 1;
+  color: #ffffff;
+}
+
+/* Modal close button */
+.woonstad-modal__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #ffffff;
+  cursor: pointer;
+  z-index: 3100;
+}
+
+/* Flow content area */
+.woonstad-modal__content {
+  flex-grow: 1;
+  background: #ffffff;
+  padding: 1rem;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.woonstad-modal__content lightning-flow {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  background: #ffffff !important;
+}

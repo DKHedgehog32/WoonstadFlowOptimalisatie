@@ -1,0 +1,131 @@
+/* =============================================
+   Woonstad Flow Supplier Check Stylesheet
+   =============================================
+   Date: 2025-07-31
+   Last Changed: 2025-07-31
+   Description:
+   Scoped CSS for the WoonstadFlowSupplierCheck LWC.
+   Provides a clean, branded layout with:
+   - Instruction text section
+   - Info block with highlighted details
+   - Styled combobox and input fields
+   - Full-width nameplate input
+*/
+
+/* Ensure the component uses full width in Flow screens */
+:host {
+    display: block;
+    width: 100%;
+}
+
+/* Main container with padding and white background */
+.container {
+    padding: 1.5rem;
+    background: #ffffff;
+    border-radius: 12px;
+}
+
+/* Instruction text styling */
+.instruction {
+    margin-bottom: 1rem;
+    font-size: 16px;
+    color: var(--ws-text-dark, #002244);
+    line-height: 1.4;
+}
+
+.instruction p {
+    margin-bottom: 0.5rem;
+}
+
+.instruction ul {
+    margin: 0.5rem 0 1rem 1.5rem;
+    padding: 0;
+    list-style-type: disc;
+    color: var(--ws-text-dark, #002244);
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+/* Highlighted info block with subtle shadow */
+.info-block {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--ws-blue-50, #f2f5fc);
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* Field rows: label + value inline */
+.field-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+/* Bold field labels with min-width for alignment */
+.field-label {
+    font-weight: bold !important;
+    margin-right: 0.5rem;
+    color: #000;
+    min-width: 220px; /* ensures labels align vertically */
+}
+
+/* Address formatting stacked vertically */
+.address-block {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.4;
+}
+
+/* Supplier section spacing */
+.supplier-section {
+    margin-bottom: 1.5rem;
+}
+
+/* === Combobox Styling: Keep compact, pill-shaped === */
+.supplier-section lightning-combobox {
+    max-width: 350px; /* natural size */
+}
+
+.supplier-section lightning-combobox::part(input) {
+    border-radius: 30px;
+    border: 1px solid var(--ws-blue-200, #86bede);
+    padding: 0.5rem 1rem;
+    font-size: 16px;
+    background-color: #ffffff;
+}
+
+/* Combobox focus outline with Woonstad branding */
+.supplier-section lightning-combobox::part(input):focus {
+    border-color: var(--ws-blue-300, #0061cd);
+    box-shadow: 0 0 0 2px var(--ws-blue-100, #cee6f9);
+}
+
+/* Dropdown menu styling for combobox */
+.supplier-section lightning-combobox::part(listbox) {
+    border-radius: 12px;
+    border: 1px solid var(--ws-blue-200, #86bede);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    background: #ffffff;
+}
+
+/* Dropdown options hover effect */
+.supplier-section lightning-combobox::part(option):hover {
+    background: var(--ws-blue-100, #cee6f9);
+    border-radius: 20px;
+}
+
+/* === Nameplate Input: Full-width pill-shaped field === */
+.supplier-section lightning-input {
+    flex: 1; /* stretch across row */
+    max-width: 100%; /* prevent overflow */
+}
+
+.supplier-section lightning-input input {
+    width: 100%;
+    border-radius: 30px;
+    border: 1px solid var(--ws-blue-200, #86bede);
+    padding: 0.5rem 1rem;
+    font-size: 16px;
+    box-sizing: border-box;
+}

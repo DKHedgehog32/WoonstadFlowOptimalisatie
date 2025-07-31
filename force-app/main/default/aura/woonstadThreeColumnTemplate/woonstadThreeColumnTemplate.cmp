@@ -1,0 +1,20 @@
+<aura:component implements="lightning:recordHomeTemplate" access="global">
+    <aura:attribute name="header" type="Aura.Component[]" />
+    <aura:attribute name="left" type="Aura.Component[]" />
+    <aura:attribute name="main" type="Aura.Component[]" />
+    <aura:attribute name="right" type="Aura.Component[]" />
+
+    <div class="ws-header">{!v.header}</div>
+
+    <lightning:layout class="ws-row" pullToBoundary="small">
+        <lightning:layoutItem size="3" mediumDeviceSize="3" padding="around-small" class="ws-left">
+            {!v.left}
+        </lightning:layoutItem>
+        <lightning:layoutItem size="6" mediumDeviceSize="6" padding="around-small" class="ws-main">
+            {!v.main}
+        </lightning:layoutItem>
+        <lightning:layoutItem size="3" mediumDeviceSize="3" padding="around-small" class="ws-right">
+            {!v.right}
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

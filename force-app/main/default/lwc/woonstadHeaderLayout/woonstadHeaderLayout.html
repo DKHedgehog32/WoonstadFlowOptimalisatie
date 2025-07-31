@@ -1,0 +1,98 @@
+<!-- 
+    =============================================
+    WoonstadHeaderLayout.html
+    =============================================
+    Date: 2025-07-31
+    Last Changed: 2025-07-31
+    Description:
+    LWC template for the Woonstad Header Layout.
+    Provides:
+    - Blue Woonstad-branded header with logo + record label
+    - White action bar with key buttons and menu
+    - Record detail fields (Preferred Communication, Phone, Email)
+    - Modal to launch the "Nieuwe Zaak" Flow
+-->
+
+<template>
+    <!-- Blue Header (always visible at top) -->
+    <div class="woonstad-header-bar">
+        <img src={logoUrl} alt="Woonstad Rotterdam Logo" class="woonstad-header-logo" />
+        <h1 class="woonstad-header-title">{objectLabel}</h1>
+    </div>
+
+    <!-- White Action Bar with buttons -->
+    <div class="woonstad-button-bar slds-grid slds-grid_align-end">
+        <!-- Follow button -->
+        <button class="slds-button slds-button_neutral woonstad-button follow-button">
+            + Follow
+        </button>
+
+        <!-- Group of record actions -->
+        <div class="slds-button-group" role="group">
+            <button class="slds-button slds-button_neutral woonstad-button" onclick={handleEdit}>Edit</button>
+            <button class="slds-button slds-button_neutral woonstad-button" onclick={handleSharing}>Sharing</button>
+            <button class="slds-button slds-button_neutral woonstad-button" onclick={handleSharingHierarchy}>Sharing Hierarchy</button>
+            <button class="slds-button slds-button_neutral woonstad-button" onclick={handleNieuweZaak}>Nieuwe Zaak</button>
+
+            <!-- More actions dropdown menu -->
+            <lightning-button-menu 
+                alternative-text="Meer acties"
+                icon-name="utility:chevrondown"
+                icon-position="right"
+                menu-alignment="right"
+                variant="border-filled"
+                class="woonstad-menu slds-button_last"
+                onselect={handleMenuAction}>
+                <lightning-menu-item value="delete" label="Delete"></lightning-menu-item>
+                <lightning-menu-item value="print" label="Printable View"></lightning-menu-item>
+                <lightning-menu-item value="recordType" label="Change Record Type"></lightning-menu-item>
+                <lightning-menu-item value="owner" label="Change Owner"></lightning-menu-item>
+            </lightning-button-menu>
+        </div>
+    </div>
+
+    <!-- Record Fields Section -->
+    <div class="woonstad-record-fields">
+        <div class="field">
+            <span class="field-label">Preferred Communication Channel</span>
+            <span class="field-value">{recordData.PreferredCommunication}</span>
+        </div>
+        <div class="field">
+            <span class="field-label">Preferred Phone</span>
+            <span class="field-value">{recordData.PreferredPhone}</span>
+        </div>
+        <div class="field">
+            <span class="field-label">Email</span>
+            <a href={emailHref} class="field-value link">{recordData.Email}</a>
+        </div>
+    </div>
+
+    <!-- Nieuwe Zaak Flow Modal -->
+    <template if:true={showFlowModal}>
+        <div class="woonstad-flow-modal">
+            <section class="slds-modal slds-fade-in-open">
+                <div class="woonstad-modal__container">
+
+                    <!-- Blue Modal Header inside white modal box -->
+                    <div class="woonstad-modal-header">
+                        <img src={logoUrl} alt="Woonstad Rotterdam Logo" class="modal-logo"/>
+                        <span class="modal-title">Nieuwe Zaak</span>
+                        <button class="woonstad-modal__close" onclick={closeNieuweZaakModal} title="Sluiten">✕</button>
+                    </div>
+
+                    <!-- Flow Content -->
+                    <div class="woonstad-modal__content">
+                        <lightning-flow 
+                            class="woonstad-flow"
+                            flow-api-name="Screen_Flow_Create_Update_New_Case_V2" 
+                            flow-input-variables={flowInputVariables}
+                            onstatuschange={handleFlowStatusChange}>
+                        </lightning-flow>
+                    </div>
+                </div>
+            </section>
+            <!-- Modal Backdrop -->
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </template>
+</template>

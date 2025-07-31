@@ -1,0 +1,78 @@
+<!-- 
+    =============================================
+    Woonstad Flow Navigation Buttons Template
+    =============================================
+    Date: 2025-07-31
+    Last Changed: 2025-07-31
+    Description:
+    Template for rendering Flow navigation buttons.
+    Supports conditional rendering of the following:
+      - Terug (Back)
+      - Reset
+      - Volgende (Next)
+      - Bevestigen (Confirm)
+    Each button is displayed only if its corresponding 
+    @api boolean property is set to true.
+-->
+
+<template>
+    <div class="button-group">
+        
+        <!-- Back Button -->
+        <template if:true={showBack}>
+            <button class="woonstad-svg-button reverse" onclick={handleBack}>
+                <span class="label">Terug</span>
+                <span class="icon-wrapper">
+                    <svg class="arrow-icon" viewBox="0 0 24 24">
+                        <path d="M19 12H5M12 5l-7 7 7 7" 
+                              fill="none" stroke="#00215B" stroke-width="2" 
+                              stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </span>
+            </button>
+        </template>
+
+        <!-- Reset Button -->
+        <template if:true={showReset}>
+            <button class="woonstad-svg-button" onclick={handleReset}>
+                <span class="label">Reset</span>
+                <span class="icon-wrapper reset-icon">
+                    <svg class="arrow-icon" viewBox="0 0 24 24">
+                        <path d="M2 12a10 10 0 1 1 5.93 9.14M2 12V7m0 5h5" 
+                              fill="none" stroke="#00215B" stroke-width="2" 
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+            </button>
+        </template>
+
+        <!-- Next Button -->
+        <template if:true={showNext}>
+            <button class="woonstad-svg-button" onclick={handleNext}>
+                <span class="label">Volgende</span>
+                <span class="icon-wrapper">
+                    <svg class="arrow-icon" viewBox="0 0 24 24">
+                        <path d="M5 12h14M12 5l7 7-7 7" 
+                              fill="none" stroke="#00215B" stroke-width="2" 
+                              stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </span>
+            </button>
+        </template>
+
+        <!-- Bevestigen Button -->
+        <template if:true={showBevestigen}>
+            <button class="woonstad-svg-button" onclick={handleBevestigen}>
+                <span class="label">Bevestigen</span>
+                <span class="icon-wrapper">
+                    <svg class="arrow-icon" viewBox="0 0 24 24">
+                        <path d="M5 12h14M12 5l7 7-7 7" 
+                              fill="none" stroke="#00215B" stroke-width="2" 
+                              stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </span>
+            </button>
+        </template>
+        
+    </div>
+</template>

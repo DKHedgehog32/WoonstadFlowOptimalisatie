@@ -1,0 +1,6 @@
+<design:component>
+    <flexipage:template>
+        <flexipage:region name="header" label="Header" defaultWidth="LARGE"/>
+        <flexipage:region name="body" label="3-Column Content" defaultWidth="LARGE"/>
+    </flexipage:template>
+</design:component>

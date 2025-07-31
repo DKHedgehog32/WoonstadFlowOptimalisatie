@@ -1,0 +1,91 @@
+/* =============================================
+   Woonstad Flow Navigation Buttons Stylesheet
+   =============================================
+   Date: 2025-07-31
+   Last Changed: 2025-07-31
+   Description:
+   Styles for the Woonstad Flow Navigation Buttons.
+   Provides consistent Woonstad branding with 
+   pill-shaped buttons, hover icons, and alignment.
+*/
+
+/* Container for all buttons */
+.button-group {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 1rem;                 /* Space between buttons */
+    padding: 1rem 0;           /* Vertical padding */
+}
+
+/* Base styling for Woonstad buttons */
+.woonstad-svg-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 42px;
+    background-color: #85E3F9; /* Woonstad light blue */
+    border: none;
+    border-radius: 40px;       /* Pill shape */
+    font-family: 'Apercu Pro', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #00215B;            /* Woonstad dark blue text */
+    padding-left: 16px;
+    padding-right: 48px;       /* Reserve space for icon */
+    position: relative;
+    box-sizing: border-box;
+    cursor: pointer;
+    overflow: visible;
+    white-space: nowrap;
+}
+
+/* Styling adjustment for Back button (icon left) */
+.woonstad-svg-button.reverse {
+    flex-direction: row-reverse;
+    padding-right: 16px;
+    padding-left: 48px;
+}
+
+/* Label styling inside button */
+.label {
+    line-height: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    z-index: 1; /* Ensure label appears above icon background */
+}
+
+/* Icon container: circular white background */
+.icon-wrapper {
+    width: 32px;
+    height: 32px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0px 2px 4px rgba(0, 33, 91, 0.25); /* Subtle shadow */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    flex-shrink: 0;
+    z-index: 2; /* Ensure icon is above button background */
+}
+
+/* Icon positioning for reverse layout (Back button) */
+.woonstad-svg-button.reverse .icon-wrapper {
+    left: 5px;
+    right: auto;
+}
+
+/* Adjustment for Reset icon for better centering */
+.icon-wrapper.reset-icon {
+    padding: 2px;
+}
+
+/* SVG arrow icon styling */
+.arrow-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+}

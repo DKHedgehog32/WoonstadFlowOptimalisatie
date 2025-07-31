@@ -1,0 +1,22 @@
+<!-- 
+    =============================================
+    Woonstad Flow Quick Action Template
+    =============================================
+    Date: 2025-07-31
+    Last Changed: 2025-07-31
+    Description:
+    Template for the WoonstadFlowQuickAction LWC.
+    Embeds a Flow inside a Quick Action modal:
+      - Launches the Flow "Screen_Flow_Create_Update_New_Case_V2".
+      - Passes the current recordId into the Flow.
+      - Listens for Flow status changes to close the modal 
+        when the Flow finishes.
+-->
+
+<template>
+    <lightning-flow 
+        flow-api-name="Screen_Flow_Create_Update_New_Case_V2"
+        flow-input-variables={flowInputs}
+        onstatuschange={handleStatusChange}>
+    </lightning-flow>
+</template>

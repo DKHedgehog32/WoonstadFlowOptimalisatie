@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    =============================================
+    Woonstad Header Layout - Meta XML
+    =============================================
+    Date: 2025-07-31
+    Last Changed: 2025-07-31
+    Description:
+    Exposes the WoonstadHeaderLayout Lightning Web Component
+    for use on Salesforce Record Pages. 
+    - Supported objects: Account, Case, Contact
+    - Provides a branded header bar, record action buttons,
+      and a modal to launch Flows such as "Nieuwe Zaak".
+-->
+
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!-- Use the latest supported Salesforce API version -->
+    <apiVersion>60.0</apiVersion>
+
+    <!-- Make the component available on record pages -->
+    <isExposed>true</isExposed>
+
+    <!-- Supported target: Record Page only -->
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+
+    <!-- Restrict component availability to key objects -->
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <objects>
+                <object>Account</object>
+                <object>Case</object>
+                <object>Contact</object>
+            </objects>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

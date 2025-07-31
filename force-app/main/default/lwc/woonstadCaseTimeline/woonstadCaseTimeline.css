@@ -1,0 +1,154 @@
+/* =============================================
+   Woonstad Case Timeline Component Stylesheet
+   =============================================
+   Date: 2025-07-31
+   Last Changed: 2025-07-31
+   Description:
+   Styles for the Woonstad Case Timeline LWC.
+   Provides a clean timeline layout with markers,
+   case details, and a modal for full case listings.
+*/
+
+/* === Full-width container for Record Page section === */
+.timeline-container {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px solid var(--ws-blue-600); /* Dark blue border for emphasis */
+    position: relative;
+}
+
+/* === Inner timeline block (centered) === */
+.timeline-grid {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    row-gap: 1.5rem;
+    max-width: 640px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Each case is a row (icon + content) */
+.timeline-row {
+    display: contents;
+}
+
+/* === Timeline marker area (left side) === */
+.timeline-marker {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Vertical line behind all icons */
+.timeline-marker::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--ws-blue-600);
+    z-index: 0;
+}
+
+/* Glowing icon circle with static resource inside */
+.case-icon-circle {
+    width: 40px;
+    height: 40px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    border: 4px solid var(--ws-ice-200);
+    box-shadow: 0 0 10px rgba(0, 197, 242, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.case-icon-circle img {
+    width: 20px;
+    height: 20px;
+}
+
+/* === Right-hand case content === */
+.timeline-content {
+    padding-left: 0.5rem;
+}
+
+.status {
+    font-weight: bold;
+    color: var(--ws-text-dark);
+}
+
+.meta {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.4;
+}
+
+/* Shortens vertical line before "Meer weergeven" */
+.end-line::before {
+    top: 0;
+    bottom: 1.25rem;
+}
+
+/* "Meer weergeven" link below timeline */
+.meer-weergeven {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ws-blue-300);
+    cursor: pointer;
+    user-select: none;
+}
+
+.clickable-subject {
+    color: var(--ws-link-hover);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Modal styles */
+.case-listview {
+    padding: 1rem;
+}
+
+.slds-modal__container {
+    max-width: 60rem;
+}
+
+/* Optional floating heading above the timeline box */
+.timeline-heading {
+    position: absolute;
+    top: -1.25rem;
+    left: 1rem;
+    background-color: #ffffff;
+    padding: 0 0.5rem;
+    font-family: 'Arboria', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ws-blue-600);
+    z-index: 2;
+}
+
+/* Section heading inside the box */
+.woonstad-timeline-heading {
+    font-family: 'Arboria', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ws-text-dark);
+    margin: 0 0 1rem 0;
+}
+
+/* Title inside the white container box */
+.timeline-title {
+    font-family: 'Arboria', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ws-blue-600);
+    margin-bottom: 1rem;
+    padding-left: 0.25rem;
+}

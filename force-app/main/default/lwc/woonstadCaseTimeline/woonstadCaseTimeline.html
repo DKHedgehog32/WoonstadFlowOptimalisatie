@@ -1,0 +1,96 @@
+<!-- 
+    =============================================
+    Woonstad Case Timeline Component
+    =============================================
+    Date: 2025-07-31
+    Last Changed: 2025-07-31
+    Description:
+    Template for displaying the most recent Cases
+    in a vertical timeline format with Woonstad 
+    branding. Shows the 5 most recent cases and 
+    provides a modal for viewing the full list.
+-->
+
+<template>
+    <div class="timeline-container">
+        <!-- Title section -->
+        <div class="timeline-title">Laatste 5 Contactmomenten</div>
+
+        <!-- Timeline list rendering -->
+        <template if:true={cases}>
+            <div class="timeline-grid">
+                <!-- Loop through the 5 most recent cases -->
+                <template for:each={cases} for:item="caseItem">
+                    <div key={caseItem.Id} class="timeline-row">
+                        <!-- Marker with Case icon -->
+                        <div class="timeline-marker">
+                            <div class="case-icon-circle">
+                                <img src={iconUrl} alt="Case Icon" />
+                            </div>
+                        </div>
+
+                        <!-- Case details -->
+                        <div class="timeline-content">
+                            <div class="status">{caseItem.Status}</div>
+                            <div class="meta">
+                                {caseItem.CaseNumber} |
+                                <!-- Clickable Case subject opens record in new tab -->
+                                <a href="javascript:void(0);" data-id={caseItem.Id} 
+                                   onclick={handleSubjectClick} 
+                                   class="clickable-subject">
+                                    {caseItem.Subject}
+                                </a> |
+                                {caseItem.formattedDate}
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Show "Meer weergeven" link if there are more than 5 Cases -->
+                <template if:true={showMoreLink}>
+                    <div class="timeline-row">
+                        <div class="timeline-marker end-line"></div>
+                        <div class="timeline-content">
+                            <div class="meer-weergeven" onclick={openModal}>
+                                Meer weergeven
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- Modal with full case list -->
+        <template if:true={showModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal header -->
+                    <header class="slds-modal__header">
+                        <h2 class="slds-modal__title">Alle zaken voor dit account</h2>
+                        <button class="slds-button slds-button_icon slds-modal__close" 
+                                title="Sluiten" onclick={closeModal}>×</button>
+                    </header>
+
+                    <!-- Modal content: Datatable of all cases -->
+                    <div class="slds-modal__content">
+                        <lightning-datatable
+                            key-field="Id"
+                            data={allCases}
+                            columns={columns}
+                            hide-checkbox-column
+                            class="case-listview">
+                        </lightning-datatable>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick={closeModal}>
+                            Sluiten
+                        </button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </div>
+</template>

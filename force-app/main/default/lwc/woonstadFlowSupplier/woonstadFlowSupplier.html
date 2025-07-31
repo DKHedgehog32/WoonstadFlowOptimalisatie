@@ -1,0 +1,46 @@
+<!-- 
+    =============================================
+    Woonstad Flow Supplier Template
+    =============================================
+    Date: 2025-07-31
+    Last Changed: 2025-07-31
+    Description:
+    Template for the WoonstadFlowSupplier LWC.
+    Displays supplier information retrieved for 
+    an Account, or shows an error message if no 
+    supplier is found.
+-->
+
+<template>
+    <div class="slds-m-around_medium">
+        
+        <!-- Show message if no supplier was found -->
+        <template if:true={noSupplierFound}>
+            <p class="slds-text-color_error slds-text-heading_small">
+                Geen leverancier gevonden voor dit account.
+            </p>
+        </template>
+
+        <!-- Display supplier details when found -->
+        <template if:false={noSupplierFound}>
+
+            <!-- Klant Naam (Account Name) -->
+            <div class="slds-m-bottom_small field-row">
+                <span class="field-label">Klant Naam:</span>
+                <lightning-formatted-text value={klantNaam}></lightning-formatted-text>
+            </div>
+
+            <!-- Eigenaar (Contract Party) -->
+            <div class="slds-m-bottom_small field-row">
+                <span class="field-label">Eigenaar:</span>
+                <lightning-formatted-text value={eigenaar}></lightning-formatted-text>
+            </div>
+
+            <!-- Supplier Name -->
+            <div class="slds-m-bottom_small field-row">
+                <span class="field-label">Supplier:</span>
+                <lightning-formatted-text value={supplierName}></lightning-formatted-text>
+            </div>
+        </template>
+    </div>
+</template>

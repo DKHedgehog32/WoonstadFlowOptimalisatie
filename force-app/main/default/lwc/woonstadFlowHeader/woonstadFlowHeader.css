@@ -1,0 +1,41 @@
+/* =============================================
+   Woonstad Flow Header Stylesheet
+   =============================================
+   Date: 2025-07-31
+   Last Changed: 2025-07-31
+   Description:
+   Styles for the Woonstad Flow Header LWC.
+   Provides a branded blue header bar with the 
+   Woonstad logo on the left and a centered title.
+*/
+
+/* Main header bar */
+.woonstad-header-bar {
+    display: flex;
+    align-items: center;          /* Vertically align logo and text */
+    justify-content: flex-start;  /* Align content from the left */
+    background-color: #0061cd;    /* Woonstad blue */
+    padding: 1.25rem 2rem;        /* Top/bottom & side padding */
+    color: white;
+    border-top-left-radius: 1rem; /* Rounded top corners */
+    border-top-right-radius: 1rem;
+    gap: 1rem;                    /* Space between logo and title */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Woonstad logo styling */
+.woonstad-header-logo {
+    height: 32px;   /* Standard height */
+    width: auto;    /* Maintain aspect ratio */
+    opacity: 0.95;  /* Slight transparency for a softer look */
+}
+
+/* Header title styling */
+.woonstad-header-title {
+    font-size: 1.4rem;   /* Readable size */
+    font-weight: 600;    /* Semi-bold for emphasis */
+    color: white;        /* Contrast against blue bar */
+    margin: 0;           /* Remove default spacing */
+    white-space: nowrap; /* Prevent text from breaking into two lines */
+}

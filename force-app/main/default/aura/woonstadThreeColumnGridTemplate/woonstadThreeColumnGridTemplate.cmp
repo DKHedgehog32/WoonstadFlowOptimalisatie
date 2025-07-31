@@ -1,0 +1,11 @@
+<aura:component implements="lightning:recordHomeTemplate" access="global">
+    <aura:attribute name="header" type="Aura.Component[]" />
+    <aura:attribute name="body" type="Aura.Component[]" />
+
+    <div class="ws-template">
+        <div class="ws-header">{!v.header}</div>
+        <div class="ws-columns">
+            {!v.body}
+        </div>
+    </div>
+</aura:component>

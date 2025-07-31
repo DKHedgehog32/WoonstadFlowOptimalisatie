@@ -1,0 +1,25 @@
+/* =============================================
+   Woonstad Flow Quick Action Modal Stylesheet
+   =============================================
+   Date: 2025-07-31
+   Last Changed: 2025-07-31
+   Description:
+   Styles to make the Flow Quick Action modal background 
+   translucent with a blur effect for a modern look.
+   Applies specifically to SLDS modal classes.
+*/
+
+/* Main modal container styling */
+.slds-modal__container {
+    background: rgba(255, 255, 255, 0.8) !important; /* Semi-transparent white */
+    backdrop-filter: blur(6px);                      /* Soft blur behind modal */
+    -webkit-backdrop-filter: blur(6px);              /* Safari compatibility */
+    border-radius: 12px;                             /* Rounded corners */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);      /* Deeper shadow for focus */
+}
+
+/* Modal content area styling */
+.slds-modal__content {
+    background: transparent !important; /* Avoids layered white background */
+    padding: 1rem;                      /* Consistent padding for readability */
+}

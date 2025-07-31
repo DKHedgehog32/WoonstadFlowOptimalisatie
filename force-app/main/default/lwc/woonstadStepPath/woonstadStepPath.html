@@ -1,0 +1,43 @@
+<!-- 
+    =============================================
+    WoonstadStepPath.html
+    =============================================
+    Date: 2025-07-31
+    Last Changed: 2025-07-31
+    Description:
+    Template for the Woonstad Step Path component.
+    - Renders a horizontal stepper from JSON input.
+    - Highlights current and completed steps.
+    - Displays tooltip text only for the active step.
+-->
+
+<template>
+    <div class="step-path-container">
+        <!-- Step Path Wrapper -->
+        <div class="step-path">
+            <!-- Render each step dynamically -->
+            <template for:each={steps} for:item="step">
+                <div key={step.number}
+                     class="step-item"
+                     data-id={step.number}
+                     onmouseover={handleMouseOver}
+                     onmouseout={handleMouseOut}>
+
+                    <!-- Step circle with number or checkmark -->
+                    <div class={step.circleClass}>{step.displayValue}</div>
+
+                    <!-- Step label below the circle -->
+                    <div class={step.labelClass}>{step.label}</div>
+
+                    <!-- Tooltip (only visible when hovering active step) -->
+                    <template if:true={step.showTooltip}>
+                        <div class="custom-tooltip">{step.tooltip}</div>
+                    </template>
+                </div>
+            </template>
+        </div>
+
+        <!-- Horizontal line behind step circles -->
+        <div class="step-line"></div>
+    </div>
+</template>

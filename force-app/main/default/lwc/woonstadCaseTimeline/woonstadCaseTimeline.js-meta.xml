@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    =============================================
+    Woonstad Case Timeline - Meta XML
+    =============================================
+    Date: 2025-07-31
+    Last Changed: 2025-07-31
+    Description:
+    Configuration file for the Woonstad Case Timeline LWC.
+    - Displays the last 5 contact moments (Cases) for an Account.
+    - Can be placed on Record Pages, App Pages, and Flow Screens.
+-->
+
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!-- API version aligned with the org runtime -->
+    <apiVersion>59.0</apiVersion>
+
+    <!-- Make component available in the App Builder -->
+    <isExposed>true</isExposed>
+
+    <!-- Label and description shown in the App Builder -->
+    <masterLabel>Woonstad Case Timeline</masterLabel>
+    <description>Toont de laatste 5 contactmomenten van een Account met verticale tijdlijn</description>
+
+    <!-- Supported targets -->
+    <targets>
+        <target>lightning__RecordPage</target>
+        <target>lightning__AppPage</target>
+        <target>lightning__FlowScreen</target>
+    </targets>
+
+    <!-- Flow Screen configuration -->
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <!-- recordId is provided by Flow when embedded on a screen -->
+            <property name="recordId" 
+                      type="String" 
+                      label="Account Id" 
+                      role="inputOnly" 
+                      required="true"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

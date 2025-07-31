@@ -1,0 +1,64 @@
+<!-- 
+    =============================================
+    WoonstadCaseTimeline.html
+    =============================================
+    Date: 2025-07-31
+    Last Changed: 2025-07-31
+    Description:
+    Timeline template showing recent Cases for an Account.
+    - Displays each Case with a marker, status, subject, and date.
+    - Includes a Case icon in each marker.
+    - Provides a "Meer weergeven" link for loading additional cases.
+    - Shows an error message if case retrieval fails.
+-->
+
+<template>
+    <div class="timeline-container">
+        <div class="timeline-grid">
+
+            <!-- Case List -->
+            <template if:true={cases}>
+                <template for:each={cases} for:item="caseItem">
+                    <div key={caseItem.Id} class="timeline-row">
+                        
+                        <!-- Marker with Case Icon -->
+                        <div class="timeline-marker">
+                            <div class="case-icon-circle">
+                                <img src={iconUrl} alt="Case Icon" />
+                            </div>
+                        </div>
+
+                        <!-- Case Details -->
+                        <div class="timeline-content">
+                            <div class="status">{caseItem.Status}</div>
+                            <div class="meta">
+                                {caseItem.CaseNumber} |
+                                <span class="clickable-subject"
+                                      data-id={caseItem.Id}
+                                      onclick={handleClick}>
+                                    {caseItem.Subject}
+                                </span>
+                                | {caseItem.CreatedDate}
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- "Meer weergeven" Link -->
+                <div class="timeline-row">
+                    <div class="timeline-marker end-line"></div>
+                    <div class="timeline-content">
+                        <div class="meer-weergeven" onclick={handleMore}>
+                            Meer weergeven
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Error Handling -->
+            <template if:true={error}>
+                <p class="error">Fout bij laden zaken</p>
+            </template>
+        </div>
+    </div>
+</template>

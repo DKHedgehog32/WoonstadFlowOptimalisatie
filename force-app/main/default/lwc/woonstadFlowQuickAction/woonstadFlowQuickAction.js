@@ -5,52 +5,78 @@
  * Date: 2025-07-31
  * Description:
  * Legacy-style Lightning Web Component for a Quick Action.
- * Ensures recordId is passed reliably into the Flow.
+ * Ensures recordId is captured via setter and passed reliably to the Flow.
+ * 
+ * Key Features:
+ * - Uses @api getter/setter for recordId to detect asynchronous injection.
+ * - Tracks readiness via a boolean flag.
+ * - Provides Flow input variables only when recordId is available.
+ * - Handles Flow status changes and closes the modal when finished.
  */
 
 import { LightningElement, api, track } from 'lwc';
 
 export default class WoonstadFlowQuickAction extends LightningElement {
-    @api recordId; // Provided by Salesforce when used as a Record Action
-    @track ready = false; // Flag to track when recordId is available
+    // Backing field for recordId
+    _recordId;
+
+    // Flag to track readiness
+    @track ready = false;
 
     /**
-     * Called when component is inserted into the DOM.
+     * recordId setter: called when Salesforce injects the recordId.
+     */
+    @api
+    set recordId(value) {
+        this._recordId = value;
+        if (value) {
+            console.log('recordId set via setter:', value);
+            this.ready = true;
+        } else {
+            console.warn('recordId setter received undefined.');
+        }
+    }
+
+    /**
+     * recordId getter: returns the backing recordId.
+     */
+    get recordId() {
+        return this._recordId;
+    }
+
+    /**
+     * Lifecycle hook: Called when the component is inserted into the DOM.
      */
     connectedCallback() {
-        console.log('Quick Action launched. recordId:', this.recordId);
-
-        // If recordId is not set yet, wait for renderedCallback
-        if (this.recordId) {
-            this.ready = true;
-        }
+        console.log('Quick Action connected. recordId:', this._recordId);
     }
 
     /**
-     * Called after render — ensures recordId is captured.
+     * Lifecycle hook: Called after each render. 
+     * Double-checks if recordId is available after render.
      */
     renderedCallback() {
-        if (!this.ready && this.recordId) {
-            console.log('RecordId became available after render:', this.recordId);
+        if (!this.ready && this._recordId) {
+            console.log('RecordId became available after render:', this._recordId);
             this.ready = true;
         }
     }
 
     /**
-     * Provides input variables for the Flow.
+     * Getter: Provides input variables for the Flow.
      */
     get flowInputs() {
-        if (this.ready && this.recordId) {
-            console.log('Passing recordId into Flow:', this.recordId);
+        if (this.ready && this._recordId) {
+            console.log('Passing recordId into Flow:', this._recordId);
             return [
                 {
                     name: 'recordId',
                     type: 'String',
-                    value: this.recordId
+                    value: this._recordId
                 }
             ];
         }
-        console.warn('No recordId available yet for Flow input.');
+        console.warn('Flow input unavailable: recordId not ready.');
         return [];
     }
 

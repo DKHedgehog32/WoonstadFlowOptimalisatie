@@ -13,6 +13,7 @@
  * - Always includes static Weijntjes Hang- En Sluitwerk.
  * - Sends email using a provided template.
  * - Logs email confirmation as a ContentVersion linked to the Case.
+ * - Updates the Case status to 'Closed' after successful processing.
  */
 public with sharing class woonstadFlowCaseCallLogEmailService {
     
@@ -64,7 +65,7 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                         Long diffMillis = Datetime.now().getTime() - startTime.getTime();
                         processMinutes = Integer.valueOf(Math.floor((Decimal)diffMillis / (1000 * 60)));
                     } catch (Exception e) {
-                        System.debug('⚠️ Could not parse flowStartTime: ' + req.flowStartTime + ' | ' + e.getMessage());
+                        System.debug('Could not parse flowStartTime: ' + req.flowStartTime + ' | ' + e.getMessage());
                     }
                 }
 
@@ -166,7 +167,7 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
 
                     Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ mail });
                 } catch (Exception e) {
-                    System.debug('⚠️ Email sending skipped or failed: ' + e.getMessage());
+                    System.debug('Email sending skipped or failed: ' + e.getMessage());
                 }
 
                 // 7. Save Email Confirmation
@@ -199,7 +200,11 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                 );
                 insert link;
 
-                // 8. Populate Response
+                // 8. Set Case to Closed after all processing
+                c.Status = 'Closed';
+                update c;
+
+                // 9. Populate Response
                 res.caseId = c.Id;
                 res.requestId = r.Id;
                 res.status = 'SUCCESS';
@@ -211,7 +216,7 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                 res.weijntjesEmail = weijntjesEmail;
 
             } catch (Exception e) {
-                System.debug('❌ Error: ' + e.getMessage());
+                System.debug('Error: ' + e.getMessage());
                 res.status = 'ERROR: ' + e.getMessage();
             }
             results.add(res);

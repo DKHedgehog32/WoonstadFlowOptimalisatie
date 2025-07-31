@@ -3,50 +3,44 @@
  * WoonstadFlowQuickAction.js
  * =============================================
  * Date: 2025-07-31
- * Last Changed: 2025-07-31
  * Description:
- * Lightning Web Component controller for a Quick Action.
- * 
- * Responsibilities:
- *  - Expose recordId from Salesforce Quick Action context.
- *  - Pass recordId into the Flow 
- *    "Screen_Flow_Create_Update_New_Case_V2".
- *  - Track lifecycle events for debugging.
- *  - Close the Quick Action modal once the Flow finishes.
+ * Legacy-style Lightning Web Component for a Quick Action.
+ * Ensures recordId is passed reliably into the Flow.
  */
 
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, track } from 'lwc';
 
 export default class WoonstadFlowQuickAction extends LightningElement {
-    // Record Id injected automatically when Quick Action is placed on a Record Page
-    @api recordId;
+    @api recordId; // Provided by Salesforce when used as a Record Action
+    @track ready = false; // Flag to track when recordId is available
 
     /**
-     * Lifecycle hook: Called when the component is inserted into the DOM.
-     * Logs whether recordId is available.
+     * Called when component is inserted into the DOM.
      */
     connectedCallback() {
+        console.log('Quick Action launched. recordId:', this.recordId);
+
+        // If recordId is not set yet, wait for renderedCallback
         if (this.recordId) {
-            console.log('Quick Action launched. recordId:', this.recordId);
-        } else {
-            console.error('Quick Action launched without recordId. This Quick Action may not be tied to Account, Case, or Contact.');
+            this.ready = true;
         }
     }
 
     /**
-     * Lifecycle hook: Called after every render of the component.
-     * Confirms recordId is present after rendering.
+     * Called after render — ensures recordId is captured.
      */
     renderedCallback() {
-        console.log('Rendered. recordId:', this.recordId);
+        if (!this.ready && this.recordId) {
+            console.log('RecordId became available after render:', this.recordId);
+            this.ready = true;
+        }
     }
 
     /**
-     * Prepares the input variables for the Flow.
-     * Returns an array mapping recordId to the Flow variable.
+     * Provides input variables for the Flow.
      */
     get flowInputs() {
-        if (this.recordId) {
+        if (this.ready && this.recordId) {
             console.log('Passing recordId into Flow:', this.recordId);
             return [
                 {
@@ -56,7 +50,8 @@ export default class WoonstadFlowQuickAction extends LightningElement {
                 }
             ];
         }
-        return []; // If no recordId, return an empty array
+        console.warn('No recordId available yet for Flow input.');
+        return [];
     }
 
     /**

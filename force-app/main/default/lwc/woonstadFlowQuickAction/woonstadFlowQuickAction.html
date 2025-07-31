@@ -14,9 +14,14 @@
 -->
 
 <template>
-    <lightning-flow 
-        flow-api-name="Screen_Flow_Create_Update_New_Case_V2"
-        flow-input-variables={flowInputs}
-        onstatuschange={handleStatusChange}>
-    </lightning-flow>
+    <lightning-card title="Nieuwe Zaak">
+        <!-- Flow container -->
+        <div class="flow-container">
+            <lightning-flow
+                flow-api-name="Screen_Flow_Create_Update_New_Case_V2"
+                flow-input-variables={flowInputs}
+                onstatuschange={handleStatusChange}>
+            </lightning-flow>
+        </div>
+    </lightning-card>
 </template>

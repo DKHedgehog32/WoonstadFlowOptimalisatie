@@ -8,24 +8,30 @@
     Description:
     Metadata configuration for the Quick Action LWC 
     that wraps the Flow "Screen_Flow_Create_Update_New_Case_V2".
-    - Allows launching the Flow as a Quick Action on records.
+    - Allows launching the Flow as a Quick Action on Account, Case, and Contact records.
 -->
 
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
-    <!-- Use the Salesforce API version aligned with your org -->
     <apiVersion>59.0</apiVersion>
-
-    <!-- Make the component available for Quick Actions -->
     <isExposed>true</isExposed>
 
-    <!-- Label and description shown in the App Builder -->
     <masterLabel>Nieuwe Zaak Quick Action</masterLabel>
     <description>
         Quick Action wrapper for Screen_Flow_Create_Update_New_Case_V2.
     </description>
 
-    <!-- Supported target: Lightning Record Action -->
     <targets>
         <target>lightning__RecordAction</target>
     </targets>
+
+    <!-- Restrict to Account, Case, and Contact so recordId is always injected -->
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordAction">
+            <objects>
+                <object>Account</object>
+                <object>Case</object>
+                <object>Contact</object>
+            </objects>
+        </targetConfig>
+    </targetConfigs>
 </LightningComponentBundle>

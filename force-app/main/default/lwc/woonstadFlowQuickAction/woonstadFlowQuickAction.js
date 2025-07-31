@@ -25,13 +25,17 @@ export default class WoonstadFlowQuickAction extends LightningElement {
         console.log('Quick Action launched. recordId:', this.recordId);
     }
 
+    renderedCallback() {
+        console.log('Rendered. recordId:', this.recordId);
+    }
+
     /**
      * Prepares input variables for the Flow.
      * Returns an array of Flow input objects containing recordId.
      */
     get flowInputs() {
-        console.log('Passing recordId into Flow:', this.recordId);
         if (this.recordId) {
+            console.log('Passing recordId into Flow:', this.recordId);
             return [
                 {
                     name: 'recordId',
@@ -40,7 +44,7 @@ export default class WoonstadFlowQuickAction extends LightningElement {
                 }
             ];
         }
-        console.error('No recordId found. This Quick Action may not be tied to an Account.');
+        console.error('No recordId found. This Quick Action may not be tied to Account, Case, or Contact.');
         return [];
     }
 

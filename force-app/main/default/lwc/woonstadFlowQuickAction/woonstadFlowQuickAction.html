@@ -1,27 +1,33 @@
 <!-- 
     =============================================
-    Woonstad Flow Quick Action Template
+    WoonstadFlowQuickAction.html
     =============================================
     Date: 2025-07-31
-    Last Changed: 2025-07-31
     Description:
-    Template for the WoonstadFlowQuickAction LWC.
-    Embeds a Flow inside a Quick Action modal:
-      - Launches the Flow "Screen_Flow_Create_Update_New_Case_V2".
-      - Passes the current recordId into the Flow.
-      - Listens for Flow status changes to close the modal 
-        when the Flow finishes.
+    Legacy-style template for the WoonstadFlowQuickAction LWC.
+    - Renders the Flow "Screen_Flow_Create_Update_New_Case_V2"
+      only when recordId is available.
+    - Shows a loading message until recordId is ready.
 -->
 
 <template>
     <lightning-card title="Nieuwe Zaak">
-        <!-- Flow container -->
-        <div class="flow-container">
-            <lightning-flow
-                flow-api-name="Screen_Flow_Create_Update_New_Case_V2"
-                flow-input-variables={flowInputs}
-                onstatuschange={handleStatusChange}>
-            </lightning-flow>
-        </div>
+        <!-- Render Flow only if recordId is available -->
+        <template if:true={ready}>
+            <div class="flow-container">
+                <lightning-flow
+                    flow-api-name="Screen_Flow_Create_Update_New_Case_V2"
+                    flow-input-variables={flowInputs}
+                    onstatuschange={handleStatusChange}>
+                </lightning-flow>
+            </div>
+        </template>
+
+        <!-- Fallback display while waiting for recordId -->
+        <template if:false={ready}>
+            <div class="slds-p-around_medium">
+                Record context is loading...
+            </div>
+        </template>
     </lightning-card>
 </template>

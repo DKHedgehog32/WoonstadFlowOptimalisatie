@@ -23,15 +23,4 @@
     <targets>
         <target>lightning__RecordAction</target>
     </targets>
-
-    <!-- Restrict to Account, Case, and Contact so recordId is always injected -->
-    <targetConfigs>
-        <targetConfig targets="lightning__RecordAction">
-            <objects>
-                <object>Account</object>
-                <object>Case</object>
-                <object>Contact</object>
-            </objects>
-        </targetConfig>
-    </targetConfigs>
 </LightningComponentBundle>

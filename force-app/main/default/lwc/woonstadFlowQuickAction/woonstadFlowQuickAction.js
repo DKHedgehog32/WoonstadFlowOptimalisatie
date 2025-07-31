@@ -11,14 +11,20 @@
 
 import { LightningElement, api, track, wire } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
+import LOGO from '@salesforce/resourceUrl/WSRLogo';
 
 export default class WoonstadFlowQuickAction extends LightningElement {
+    // ========== Properties ==========
     // Backing field for recordId
     _recordId;
 
     // Track readiness of record context
     @track ready = false;
 
+    // Static resource: Woonstad Rotterdam Logo
+    logoUrl = LOGO;
+
+    // ========== RecordId Handling ==========
     /**
      * recordId setter: called when Salesforce injects the recordId.
      */
@@ -28,6 +34,8 @@ export default class WoonstadFlowQuickAction extends LightningElement {
             this._recordId = value;
             this.ready = true;
             console.log('recordId set via setter:', value);
+        } else {
+            console.warn('recordId setter received undefined.');
         }
     }
 
@@ -51,6 +59,7 @@ export default class WoonstadFlowQuickAction extends LightningElement {
         }
     }
 
+    // ========== Flow Handling ==========
     /**
      * Getter: Provides Flow input variables.
      */
@@ -65,6 +74,7 @@ export default class WoonstadFlowQuickAction extends LightningElement {
                 }
             ];
         }
+        console.warn('Flow input unavailable: recordId not set yet.');
         return [];
     }
 

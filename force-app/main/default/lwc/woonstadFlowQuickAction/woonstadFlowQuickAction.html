@@ -5,12 +5,18 @@
     Date: 2025-07-31
     Description:
     Legacy-style template for the WoonstadFlowQuickAction LWC.
-    Uses wired CurrentPageReference to capture recordId early.
+    Includes Woonstad header with logo and a Flow container.
 -->
 
 <template>
-    <lightning-card title="Nieuwe Zaak">
-        <!-- Show Flow only when recordId is ready -->
+    <!-- 🔵 Blue Header -->
+    <div class="woonstad-header-bar">
+        <img src={logoUrl} alt="Woonstad Rotterdam Logo" class="woonstad-header-logo" />
+        <h1 class="woonstad-header-title">Nieuwe Zaak</h1>
+    </div>
+
+    <lightning-card>
+        <!-- Flow renders only if recordId is ready -->
         <template if:true={ready}>
             <div class="flow-container">
                 <lightning-flow
@@ -21,10 +27,11 @@
             </div>
         </template>
 
-        <!-- Fallback display while waiting for recordId -->
+        <!-- Loading placeholder -->
         <template if:false={ready}>
-            <div class="slds-p-around_medium">
-                Record context is loading...
+            <div class="slds-p-around_medium slds-text-align_center">
+                <lightning-spinner alternative-text="Laden..." size="medium"></lightning-spinner>
+                <p class="slds-m-top_small">Record context wordt geladen...</p>
             </div>
         </template>
     </lightning-card>

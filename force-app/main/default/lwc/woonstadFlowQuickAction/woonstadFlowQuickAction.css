@@ -23,3 +23,32 @@
     background: transparent !important; /* Avoids layered white background */
     padding: 1rem;                      /* Consistent padding for readability */
 }
+
+/* 🔵 Woonstad Header Bar */
+.woonstad-header-bar {
+    display: flex;
+    align-items: center;
+    background-color: #0061cd;          /* Woonstad Blue */
+    padding: 1rem 2rem;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    color: white;
+}
+
+/* Logo styling */
+.woonstad-header-logo {
+    height: 32px;
+    margin-right: 1rem;
+}
+
+/* Header title styling */
+.woonstad-header-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Flow container inside modal */
+.flow-container {
+    padding: 1rem;
+}

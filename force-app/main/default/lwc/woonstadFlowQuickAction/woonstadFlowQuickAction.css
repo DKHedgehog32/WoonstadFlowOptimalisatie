@@ -1,34 +1,32 @@
 /* =============================================
-   Woonstad Flow Quick Action Modal Stylesheet
+   Woonstad Flow Quick Action Stylesheet
    =============================================
    Date: 2025-08-01
    Last Changed: 2025-08-01
    Description:
-   Ensures translucent Woonstad-styled modal with blur.
-   Fixes ghost white background introduced by inner
-   SLDS layers in lightning-quick-action-panel.
-   Scoped for this LWC only.
+   Styles for the Woonstad Quick Action modal.
+   Ensures blur effect and full-width header.
 */
 
-/* Main modal container */
-:host ::deep(.slds-modal__container) {
+/* Main modal container styling */
+.slds-modal__container {
     background: rgba(255, 255, 255, 0.8) !important; /* Semi-transparent white */
     backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px); /* Safari compatibility */
+    -webkit-backdrop-filter: blur(6px);
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-    overflow: hidden; /* Ensure inner content respects rounded corners */
+    overflow: hidden;
 }
 
-/* Kill default inner white backgrounds */
-:host ::deep(.slds-modal__content) {
+/* Modal content area styling */
+.slds-modal__content {
     background: transparent !important;
-    padding: 0 !important; /* Header and Flow handle spacing */
+    padding: 0 !important; /* Let header/flow handle spacing */
     border: none !important;
     box-shadow: none !important;
 }
 
-/* Header Bar */
+/* Woonstad Header Bar */
 .woonstad-header-bar {
     display: flex;
     align-items: center;
@@ -42,13 +40,13 @@
     border-top-right-radius: 12px;
 }
 
-/* Logo */
+/* Logo styling */
 .woonstad-header-logo {
     height: 32px;
     margin-right: 1rem;
 }
 
-/* Header Title */
+/* Header title styling */
 .woonstad-header-title {
     font-size: 1.4rem;
     font-weight: 600;
@@ -57,12 +55,7 @@
 
 /* Flow container */
 .flow-container {
-    padding: 1rem 2rem; /* Give Flow content breathing space */
-    box-sizing: border-box;
+    padding: 1rem 2rem;
     width: 100%;
-}
-
-/* Optional: Style spinner section */
-:host ::deep(.slds-text-align_center) {
-    background: transparent !important;
+    box-sizing: border-box;
 }

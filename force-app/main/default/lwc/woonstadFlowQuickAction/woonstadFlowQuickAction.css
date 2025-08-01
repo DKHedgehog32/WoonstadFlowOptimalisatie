@@ -1,39 +1,34 @@
 /* =============================================
    Woonstad Flow Quick Action Modal Stylesheet
    =============================================
-   Date: 2025-07-31
+   Date: 2025-08-01
    Last Changed: 2025-08-01
    Description:
-   Fixes ghost white background by fully overriding
-   SLDS modal layers. Ensures translucent modal with
-   blur and Woonstad branding.
+   Ensures translucent Woonstad-styled modal with blur.
+   Fixes ghost white background introduced by inner
+   SLDS layers in lightning-quick-action-panel.
+   Scoped for this LWC only.
 */
 
-/* Main modal container styling */
-.slds-modal__container {
+/* Main modal container */
+:host ::deep(.slds-modal__container) {
     background: rgba(255, 255, 255, 0.8) !important; /* Semi-transparent white */
     backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px); /* Safari compatibility */
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-    overflow: hidden; /* Clip inner backgrounds */
+    overflow: hidden; /* Ensure inner content respects rounded corners */
 }
 
-/* Kill default white background layers */
-.slds-modal__content,
-.slds-modal__container .slds-modal__content {
+/* Kill default inner white backgrounds */
+:host ::deep(.slds-modal__content) {
     background: transparent !important;
-    padding: 0 !important; /* header handles spacing */
+    padding: 0 !important; /* Header and Flow handle spacing */
     border: none !important;
     box-shadow: none !important;
 }
 
-/* Remove ghost padding around header */
-.slds-modal__content > .slds-p-around_medium {
-    background: transparent !important;
-}
-
-/* Woonstad Header Bar */
+/* Header Bar */
 .woonstad-header-bar {
     display: flex;
     align-items: center;
@@ -47,20 +42,27 @@
     border-top-right-radius: 12px;
 }
 
-/* Logo styling */
+/* Logo */
 .woonstad-header-logo {
     height: 32px;
     margin-right: 1rem;
 }
 
-/* Header title styling */
+/* Header Title */
 .woonstad-header-title {
     font-size: 1.4rem;
     font-weight: 600;
     margin: 0;
 }
 
-/* Flow container inside modal */
+/* Flow container */
 .flow-container {
-    padding: 1rem 2rem;
+    padding: 1rem 2rem; /* Give Flow content breathing space */
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* Optional: Style spinner section */
+:host ::deep(.slds-text-align_center) {
+    background: transparent !important;
 }

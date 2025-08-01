@@ -3,10 +3,12 @@
  * WoonstadFlowQuickAction.js
  * =============================================
  * Date: 2025-07-31
+ * Last Changed: 2025-07-31
  * Description:
  * Legacy-style Lightning Web Component Quick Action.
  * Uses wired CurrentPageReference to fetch recordId early.
  * Ensures the Flow only loads once recordId is available.
+ * Includes auto-sizing via lightning-quick-action-panel.
  */
 
 import { LightningElement, api, track, wire } from 'lwc';
@@ -14,7 +16,10 @@ import { CurrentPageReference } from 'lightning/navigation';
 import LOGO from '@salesforce/resourceUrl/WSRLogo';
 
 export default class WoonstadFlowQuickAction extends LightningElement {
-    // ========== Properties ==========
+    // ============================================
+    // ========== Properties ======================
+    // ============================================
+
     // Backing field for recordId
     _recordId;
 
@@ -24,9 +29,13 @@ export default class WoonstadFlowQuickAction extends LightningElement {
     // Static resource: Woonstad Rotterdam Logo
     logoUrl = LOGO;
 
-    // ========== RecordId Handling ==========
+    // ============================================
+    // ========== RecordId Handling ===============
+    // ============================================
+
     /**
      * recordId setter: called when Salesforce injects the recordId.
+     * This ensures we have the record context before rendering Flow.
      */
     @api
     set recordId(value) {
@@ -41,6 +50,7 @@ export default class WoonstadFlowQuickAction extends LightningElement {
 
     /**
      * Getter for recordId.
+     * Returns the backing field if set.
      */
     get recordId() {
         return this._recordId;
@@ -49,6 +59,8 @@ export default class WoonstadFlowQuickAction extends LightningElement {
     /**
      * Wired page reference: fallback to extract recordId
      * if not already set by Salesforce injection.
+     * Ensures the Quick Action works even when context
+     * injection is delayed or missing.
      */
     @wire(CurrentPageReference)
     wiredPageRef(pageRef) {
@@ -59,9 +71,13 @@ export default class WoonstadFlowQuickAction extends LightningElement {
         }
     }
 
-    // ========== Flow Handling ==========
+    // ============================================
+    // ========== Flow Handling ===================
+    // ============================================
+
     /**
      * Getter: Provides Flow input variables.
+     * Prepares an array with the recordId for the Flow.
      */
     get flowInputs() {
         if (this.ready && this._recordId) {
@@ -79,7 +95,8 @@ export default class WoonstadFlowQuickAction extends LightningElement {
     }
 
     /**
-     * Handles Flow status changes and closes the modal when finished.
+     * Handles Flow status changes.
+     * When the Flow finishes, closes the Quick Action modal.
      */
     handleStatusChange(event) {
         const status = event.detail.status;
@@ -87,7 +104,26 @@ export default class WoonstadFlowQuickAction extends LightningElement {
 
         if (status === 'FINISHED' || status === 'FINISHED_SCREEN') {
             console.log('Flow finished, closing Quick Action modal.');
-            this.dispatchEvent(new CustomEvent('close'));
+            this.closeAction();
         }
+    }
+
+    // ============================================
+    // ========== Modal Handling ==================
+    // ============================================
+
+    /**
+     * Handler for manual close (user clicks close button).
+     */
+    handleClose() {
+        console.log('Close button triggered on Quick Action panel.');
+        this.closeAction();
+    }
+
+    /**
+     * Dispatches the close event to tell Salesforce to close the modal.
+     */
+    closeAction() {
+        this.dispatchEvent(new CustomEvent('close'));
     }
 }

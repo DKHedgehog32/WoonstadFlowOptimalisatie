@@ -12,32 +12,30 @@
    - Full-width nameplate input
 */
 
-/* Ensure the component uses full width in Flow screens */
 :host {
     display: block;
     width: 100%;
 }
 
-/* Main container with padding and white background */
 .container {
     padding: 1.5rem;
     background: #ffffff;
     border-radius: 12px;
 }
 
-/* Instruction text styling */
-.instruction {
-    margin-bottom: 1rem;
-    font-size: 16px;
-    color: var(--ws-text-dark, #002244);
-    line-height: 1.4;
+/* Instruction styled as title.block */
+.instruction.title.block {
+    margin-bottom: 1.5rem;
+    color: var(--ws-blue-600, #003c80);
 }
 
-.instruction p {
+/* Paragraphs inside instruction */
+.instruction.title.block p {
     margin-bottom: 0.5rem;
 }
 
-.instruction ul {
+/* Bullet list inside instruction */
+.instruction.title.block ul {
     margin: 0.5rem 0 1rem 1.5rem;
     padding: 0;
     list-style-type: disc;
@@ -46,7 +44,7 @@
     line-height: 1.4;
 }
 
-/* Highlighted info block with subtle shadow */
+/* Info block styling */
 .info-block {
     margin-bottom: 1.5rem;
     padding: 1rem;
@@ -55,22 +53,22 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-/* Field rows: label + value inline */
+/* Field row layout */
 .field-row {
     display: flex;
     align-items: center;
     margin-bottom: 0.75rem;
 }
 
-/* Bold field labels with min-width for alignment */
+/* Bold label styling */
 .field-label {
     font-weight: bold !important;
     margin-right: 0.5rem;
     color: #000;
-    min-width: 220px; /* ensures labels align vertically */
+    min-width: 220px; /* keeps alignment */
 }
 
-/* Address formatting stacked vertically */
+/* Address formatting */
 .address-block {
     display: flex;
     flex-direction: column;
@@ -82,9 +80,9 @@
     margin-bottom: 1.5rem;
 }
 
-/* === Combobox Styling: Keep compact, pill-shaped === */
+/* Combobox styled as pill but natural width */
 .supplier-section lightning-combobox {
-    max-width: 350px; /* natural size */
+    max-width: 350px; /* keep dropdown natural */
 }
 
 .supplier-section lightning-combobox::part(input) {
@@ -95,13 +93,13 @@
     background-color: #ffffff;
 }
 
-/* Combobox focus outline with Woonstad branding */
+/* Focus outline for combobox */
 .supplier-section lightning-combobox::part(input):focus {
     border-color: var(--ws-blue-300, #0061cd);
     box-shadow: 0 0 0 2px var(--ws-blue-100, #cee6f9);
 }
 
-/* Dropdown menu styling for combobox */
+/* Dropdown menu styling */
 .supplier-section lightning-combobox::part(listbox) {
     border-radius: 12px;
     border: 1px solid var(--ws-blue-200, #86bede);
@@ -109,16 +107,16 @@
     background: #ffffff;
 }
 
-/* Dropdown options hover effect */
+/* Dropdown option hover */
 .supplier-section lightning-combobox::part(option):hover {
     background: var(--ws-blue-100, #cee6f9);
     border-radius: 20px;
 }
 
-/* === Nameplate Input: Full-width pill-shaped field === */
+/* Naamplaatje input full width */
 .supplier-section lightning-input {
-    flex: 1; /* stretch across row */
-    max-width: 100%; /* prevent overflow */
+    flex: 1;
+    max-width: 100%;
 }
 
 .supplier-section lightning-input input {

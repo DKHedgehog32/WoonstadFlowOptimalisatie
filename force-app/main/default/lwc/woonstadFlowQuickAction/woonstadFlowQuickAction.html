@@ -6,17 +6,18 @@
     Description:
     Legacy-style template for the WoonstadFlowQuickAction LWC.
     Includes Woonstad header with logo and a Flow container.
+    Uses lightning-quick-action-panel for auto-sizing.
 -->
 
 <template>
-    <!-- 🔵 Blue Header -->
-    <div class="woonstad-header-bar">
-        <img src={logoUrl} alt="Woonstad Rotterdam Logo" class="woonstad-header-logo" />
-        <h1 class="woonstad-header-title">Nieuwe Zaak</h1>
-    </div>
+    <lightning-quick-action-panel onclose={handleClose}>
+        <!-- 🔵 Woonstad Blue Header -->
+        <div class="woonstad-header-bar">
+            <img src={logoUrl} alt="Woonstad Rotterdam Logo" class="woonstad-header-logo" />
+            <h1 class="woonstad-header-title">Nieuwe Zaak</h1>
+        </div>
 
-    <lightning-card>
-        <!-- Flow renders only if recordId is ready -->
+        <!-- Flow container -->
         <template if:true={ready}>
             <div class="flow-container">
                 <lightning-flow
@@ -34,5 +35,5 @@
                 <p class="slds-m-top_small">Record context wordt geladen...</p>
             </div>
         </template>
-    </lightning-card>
+    </lightning-quick-action-panel>
 </template>

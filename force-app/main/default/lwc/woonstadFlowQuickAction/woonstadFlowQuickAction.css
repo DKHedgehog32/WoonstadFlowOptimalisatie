@@ -2,24 +2,65 @@
    Woonstad Flow Quick Action Modal Stylesheet
    =============================================
    Date: 2025-07-31
-   Last Changed: 2025-07-31
+   Last Changed: 2025-08-01
    Description:
-   Styles to make the Flow Quick Action modal background 
-   translucent with a blur effect for a modern look.
-   Applies specifically to SLDS modal classes.
+   Fixes ghost white background by fully overriding
+   SLDS modal layers. Ensures translucent modal with
+   blur and Woonstad branding.
 */
 
 /* Main modal container styling */
 .slds-modal__container {
     background: rgba(255, 255, 255, 0.8) !important; /* Semi-transparent white */
-    backdrop-filter: blur(6px);                      /* Soft blur behind modal */
-    -webkit-backdrop-filter: blur(6px);              /* Safari compatibility */
-    border-radius: 12px;                             /* Rounded corners */
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);      /* Deeper shadow for focus */
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    overflow: hidden; /* Clip inner backgrounds */
 }
 
-/* Modal content area styling */
-.slds-modal__content {
-    background: transparent !important; /* Avoids layered white background */
-    padding: 1rem;                      /* Consistent padding for readability */
+/* Kill default white background layers */
+.slds-modal__content,
+.slds-modal__container .slds-modal__content {
+    background: transparent !important;
+    padding: 0 !important; /* header handles spacing */
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Remove ghost padding around header */
+.slds-modal__content > .slds-p-around_medium {
+    background: transparent !important;
+}
+
+/* Woonstad Header Bar */
+.woonstad-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #0061cd; /* Woonstad Blue */
+    padding: 1rem 2rem;
+    width: 100%;
+    box-sizing: border-box;
+    color: white;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+/* Logo styling */
+.woonstad-header-logo {
+    height: 32px;
+    margin-right: 1rem;
+}
+
+/* Header title styling */
+.woonstad-header-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Flow container inside modal */
+.flow-container {
+    padding: 1rem 2rem;
 }

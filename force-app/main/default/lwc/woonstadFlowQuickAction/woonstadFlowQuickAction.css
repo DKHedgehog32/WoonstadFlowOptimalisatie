@@ -16,43 +16,10 @@
     -webkit-backdrop-filter: blur(6px);              /* Safari compatibility */
     border-radius: 12px;                             /* Rounded corners */
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);      /* Deeper shadow for focus */
-    overflow: hidden;                                /* Clip children to rounded edges */
 }
 
 /* Modal content area styling */
 .slds-modal__content {
-    background: transparent !important; 
-    padding: 0; /* Remove default padding so header stretches full width */
-}
-
-/* Woonstad Header Bar */
-.woonstad-header-bar {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    background-color: #0061cd;          /* Woonstad Blue */
-    padding: 1rem 2rem;
-    width: 100%;                        /* Stretch edge-to-edge */
-    box-sizing: border-box;             /* Include padding in total width */
-    color: white;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-}
-
-/* Logo styling */
-.woonstad-header-logo {
-    height: 32px;
-    margin-right: 1rem;
-}
-
-/* Header title styling */
-.woonstad-header-title {
-    font-size: 1.4rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-/* Flow container inside modal */
-.flow-container {
-    padding: 1rem 2rem; /* Restore content padding below the header */
+    background: transparent !important; /* Avoids layered white background */
+    padding: 1rem;                      /* Consistent padding for readability */
 }

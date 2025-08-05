@@ -11,8 +11,11 @@
  *      Supplier_Name_Plate__c stores the API name
  *      Supplier display name & email used for sending.
  * - Always includes static Weijntjes Hang- En Sluitwerk.
- * - Sends email using a provided template.
- * - Logs email confirmation as a ContentVersion linked to the Case.
+ * - Sends two emails:
+ *      (1) To the Supplier using supplierTemplateId
+ *      (2) To the Renter using renterTemplateId
+ * - Ensures both emails are logged to the Case activity history.
+ * - Logs email confirmations as ContentVersion linked to the Case.
  * - Updates the Case status to 'Closed' after successful processing.
  * - Copies Label__c from Account to Case.
  */
@@ -22,7 +25,8 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
     public class Request {
         @InvocableVariable(required=true) public Id accountId;
         @InvocableVariable(required=true) public Id contactId; // AccountId if Person Account
-        @InvocableVariable(required=true) public Id templateId;
+        @InvocableVariable(required=true) public Id supplierTemplateId;
+        @InvocableVariable(required=true) public Id renterTemplateId;
         @InvocableVariable(required=true) public String caseOrigin;
         @InvocableVariable(required=true) public String nameplateText;
         @InvocableVariable(required=false) public String flowStartTime;
@@ -95,7 +99,7 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
 
                 Id runningUserId = UserInfo.getUserId();
 
-                // 1. Create Case (now also populating Label__c)
+                // 1. Create Case (populate Label__c)
                 Case c = new Case(
                     Subject = subjectText,
                     Description = descriptionText,
@@ -126,7 +130,7 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                 String weijntjesName    = (supplier != null ? supplier.weijntjesName : 'Weijntjes Hang- En Sluitwerk');
                 String weijntjesEmail   = (supplier != null ? supplier.weijntjesEmail : 'dennis.kristoffers@cobracrm.nl');
 
-                // 3. Create Request__c record (store API name, not display name)
+                // 3. Create Request__c record
                 Request__c r = new Request__c(
                     Account__c = req.accountId,
                     Case__c = c.Id,
@@ -146,68 +150,107 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                 c.Request__c = r.Id;
                 update c;
 
-                // 5. Person Account logic
-                Id targetId = req.contactId;
-                if (targetId != null && String.valueOf(targetId).startsWith('001')) {
-                    if (acc.IsPersonAccount && acc.PersonContactId != null) {
-                        targetId = acc.PersonContactId;
-                    } else {
-                        throw new AuraHandledException('Provided Account Id is not a Person Account or has no PersonContactId.');
-                    }
+                // 5. Determine ContactId for logging emails
+                Id logContactId = acc.PersonContactId != null ? acc.PersonContactId : req.contactId;
+                if (logContactId == null) {
+                    logContactId = UserInfo.getUserId(); // fallback so email logs
                 }
 
-                // 6. Send Email
+                // 6. Send Email to Supplier (logs via TargetObjectId)
                 try {
-                    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                    mail.setTargetObjectId(targetId);
-                    mail.setTemplateId(req.templateId);
-                    mail.setWhatId(c.Id);
-                    mail.setSaveAsActivity(true);
-
-                    if (!String.isBlank(supplierEmail)) {
-                        mail.setToAddresses(new List<String>{ supplierEmail });
+                    if (!String.isBlank(supplierEmail) && req.supplierTemplateId != null) {
+                        Messaging.SingleEmailMessage supplierMail = new Messaging.SingleEmailMessage();
+                        supplierMail.setTemplateId(req.supplierTemplateId);
+                        supplierMail.setWhatId(c.Id);
+                        supplierMail.setSaveAsActivity(true);
+                        supplierMail.setTargetObjectId(logContactId);
+                        supplierMail.setToAddresses(new List<String>{ supplierEmail });
+                        Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ supplierMail });
                     }
-
-                    Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ mail });
                 } catch (Exception e) {
-                    System.debug('Email sending skipped or failed: ' + e.getMessage());
+                    System.debug('Email to supplier skipped or failed: ' + e.getMessage());
                 }
 
-                // 7. Save Email Confirmation
-                EmailTemplate tmpl = [
-                    SELECT Id, Name, DeveloperName, Subject, Description
-                    FROM EmailTemplate
-                    WHERE Id = :req.templateId
-                    LIMIT 1
-                ];
+                // 7. Send Email to Renter (logs via TargetObjectId)
+                try {
+                    if (!String.isBlank(acc.PersonEmail) && req.renterTemplateId != null) {
+                        Messaging.SingleEmailMessage renterMail = new Messaging.SingleEmailMessage();
+                        renterMail.setTemplateId(req.renterTemplateId);
+                        renterMail.setWhatId(c.Id);
+                        renterMail.setSaveAsActivity(true);
+                        renterMail.setTargetObjectId(logContactId);
+                        renterMail.setToAddresses(new List<String>{ acc.PersonEmail });
+                        Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ renterMail });
+                    }
+                } catch (Exception e) {
+                    System.debug('Email to renter skipped or failed: ' + e.getMessage());
+                }
 
-                String emailBody = 'Email sent using Template: ' + tmpl.Name +
-                                   '\nSubject: ' + tmpl.Subject +
-                                   '\nDescription: ' + (tmpl.Description != null ? tmpl.Description : 'No Description') +
-                                   '\nCase: ' + c.CaseNumber +
-                                   '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm');
+                // 8. Save Email Confirmation for Supplier
+                if (req.supplierTemplateId != null) {
+                    EmailTemplate tmplSupplier = [
+                        SELECT Id, Name, DeveloperName, Subject, Description
+                        FROM EmailTemplate
+                        WHERE Id = :req.supplierTemplateId
+                        LIMIT 1
+                    ];
+                    String emailBodySupplier = 'Email sent to Supplier using Template: ' + tmplSupplier.Name +
+                                               '\nSubject: ' + tmplSupplier.Subject +
+                                               '\nCase: ' + c.CaseNumber +
+                                               '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm');
 
-                ContentVersion cv = new ContentVersion(
-                    Title = 'Email Confirmation - ' + c.CaseNumber,
-                    PathOnClient = 'CaseEmailConfirmation.txt',
-                    VersionData = Blob.valueOf(emailBody),
-                    Origin = 'H'
-                );
-                insert cv;
+                    ContentVersion cvSupplier = new ContentVersion(
+                        Title = 'Email Confirmation (Supplier) - ' + c.CaseNumber,
+                        PathOnClient = 'CaseEmailConfirmationSupplier.txt',
+                        VersionData = Blob.valueOf(emailBodySupplier),
+                        Origin = 'H'
+                    );
+                    insert cvSupplier;
 
-                ContentDocumentLink link = new ContentDocumentLink(
-                    ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId,
-                    LinkedEntityId = c.Id,
-                    ShareType = 'V',
-                    Visibility = 'AllUsers'
-                );
-                insert link;
+                    ContentDocumentLink linkSupplier = new ContentDocumentLink(
+                        ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cvSupplier.Id].ContentDocumentId,
+                        LinkedEntityId = c.Id,
+                        ShareType = 'V',
+                        Visibility = 'AllUsers'
+                    );
+                    insert linkSupplier;
+                }
 
-                // 8. Set Case to Closed after all processing
+                // 9. Save Email Confirmation for Renter
+                if (req.renterTemplateId != null) {
+                    EmailTemplate tmplRenter = [
+                        SELECT Id, Name, DeveloperName, Subject, Description
+                        FROM EmailTemplate
+                        WHERE Id = :req.renterTemplateId
+                        LIMIT 1
+                    ];
+                    String emailBodyRenter = 'Email sent to Renter using Template: ' + tmplRenter.Name +
+                                             '\nSubject: ' + tmplRenter.Subject +
+                                             '\nCase: ' + c.CaseNumber +
+                                             '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm');
+
+                    ContentVersion cvRenter = new ContentVersion(
+                        Title = 'Email Confirmation (Renter) - ' + c.CaseNumber,
+                        PathOnClient = 'CaseEmailConfirmationRenter.txt',
+                        VersionData = Blob.valueOf(emailBodyRenter),
+                        Origin = 'H'
+                    );
+                    insert cvRenter;
+
+                    ContentDocumentLink linkRenter = new ContentDocumentLink(
+                        ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cvRenter.Id].ContentDocumentId,
+                        LinkedEntityId = c.Id,
+                        ShareType = 'V',
+                        Visibility = 'AllUsers'
+                    );
+                    insert linkRenter;
+                }
+
+                // 10. Set Case to Closed after all processing
                 c.Status = 'Closed';
                 update c;
 
-                // 9. Populate Response
+                // 11. Populate Response
                 res.caseId = c.Id;
                 res.requestId = r.Id;
                 res.status = 'SUCCESS';

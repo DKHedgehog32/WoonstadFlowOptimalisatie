@@ -3,7 +3,7 @@
  * Woonstad Flow Case Call Log Email Service
  * =============================================
  * Date: 2025-07-31
- * Last Changed: 2025-07-31
+ * Last Changed: 2025-08-05
  * Description:
  * Invocable Apex service for Salesforce Flow.
  * - Creates a Case and related Request__c record.
@@ -150,20 +150,16 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                 c.Request__c = r.Id;
                 update c;
 
-                // 5. Determine ContactId for logging emails
-                Id logContactId = acc.PersonContactId != null ? acc.PersonContactId : req.contactId;
-                if (logContactId == null) {
-                    logContactId = UserInfo.getUserId(); // fallback so email logs
-                }
+                // 5. Determine ContactId for renter
+                Id renterContactId = acc.PersonContactId != null ? acc.PersonContactId : req.contactId;
 
-                // 6. Send Email to Supplier (logs via TargetObjectId)
+                // 6. Send Email to Supplier (logs via WhatId only)
                 try {
                     if (!String.isBlank(supplierEmail) && req.supplierTemplateId != null) {
                         Messaging.SingleEmailMessage supplierMail = new Messaging.SingleEmailMessage();
                         supplierMail.setTemplateId(req.supplierTemplateId);
-                        supplierMail.setWhatId(c.Id);
+                        supplierMail.setWhatId(c.Id); // logs on Case
                         supplierMail.setSaveAsActivity(true);
-                        supplierMail.setTargetObjectId(logContactId);
                         supplierMail.setToAddresses(new List<String>{ supplierEmail });
                         Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ supplierMail });
                     }
@@ -171,14 +167,16 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                     System.debug('Email to supplier skipped or failed: ' + e.getMessage());
                 }
 
-                // 7. Send Email to Renter (logs via TargetObjectId)
+                // 7. Send Email to Renter (logs on Case + Contact)
                 try {
                     if (!String.isBlank(acc.PersonEmail) && req.renterTemplateId != null) {
                         Messaging.SingleEmailMessage renterMail = new Messaging.SingleEmailMessage();
                         renterMail.setTemplateId(req.renterTemplateId);
                         renterMail.setWhatId(c.Id);
                         renterMail.setSaveAsActivity(true);
-                        renterMail.setTargetObjectId(logContactId);
+                        if (renterContactId != null) {
+                            renterMail.setTargetObjectId(renterContactId);
+                        }
                         renterMail.setToAddresses(new List<String>{ acc.PersonEmail });
                         Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ renterMail });
                     }
@@ -188,65 +186,71 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
 
                 // 8. Save Email Confirmation for Supplier
                 if (req.supplierTemplateId != null) {
-                    EmailTemplate tmplSupplier = [
+                    List<EmailTemplate> supplierTemplates = [
                         SELECT Id, Name, DeveloperName, Subject, Description
                         FROM EmailTemplate
                         WHERE Id = :req.supplierTemplateId
                         LIMIT 1
                     ];
-                    String emailBodySupplier = 'Email sent to Supplier using Template: ' + tmplSupplier.Name +
-                                               '\nSubject: ' + tmplSupplier.Subject +
-                                               '\nCase: ' + c.CaseNumber +
-                                               '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm');
+                    if (!supplierTemplates.isEmpty()) {
+                        EmailTemplate tmplSupplier = supplierTemplates[0];
+                        String emailBodySupplier = 'Email sent to Supplier using Template: ' + tmplSupplier.Name +
+                                                   '\nSubject: ' + tmplSupplier.Subject +
+                                                   '\nCase: ' + c.CaseNumber +
+                                                   '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm');
 
-                    ContentVersion cvSupplier = new ContentVersion(
-                        Title = 'Email Confirmation (Supplier) - ' + c.CaseNumber,
-                        PathOnClient = 'CaseEmailConfirmationSupplier.txt',
-                        VersionData = Blob.valueOf(emailBodySupplier),
-                        Origin = 'H'
-                    );
-                    insert cvSupplier;
+                        ContentVersion cvSupplier = new ContentVersion(
+                            Title = 'Email Confirmation (Supplier) - ' + c.CaseNumber,
+                            PathOnClient = 'CaseEmailConfirmationSupplier.txt',
+                            VersionData = Blob.valueOf(emailBodySupplier),
+                            Origin = 'H'
+                        );
+                        insert cvSupplier;
 
-                    ContentDocumentLink linkSupplier = new ContentDocumentLink(
-                        ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cvSupplier.Id].ContentDocumentId,
-                        LinkedEntityId = c.Id,
-                        ShareType = 'V',
-                        Visibility = 'AllUsers'
-                    );
-                    insert linkSupplier;
+                        ContentDocumentLink linkSupplier = new ContentDocumentLink(
+                            ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cvSupplier.Id].ContentDocumentId,
+                            LinkedEntityId = c.Id,
+                            ShareType = 'V',
+                            Visibility = 'AllUsers'
+                        );
+                        insert linkSupplier;
+                    }
                 }
 
                 // 9. Save Email Confirmation for Renter
                 if (req.renterTemplateId != null) {
-                    EmailTemplate tmplRenter = [
+                    List<EmailTemplate> renterTemplates = [
                         SELECT Id, Name, DeveloperName, Subject, Description
                         FROM EmailTemplate
                         WHERE Id = :req.renterTemplateId
                         LIMIT 1
                     ];
-                    String emailBodyRenter = 'Email sent to Renter using Template: ' + tmplRenter.Name +
-                                             '\nSubject: ' + tmplRenter.Subject +
-                                             '\nCase: ' + c.CaseNumber +
-                                             '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm');
+                    if (!renterTemplates.isEmpty()) {
+                        EmailTemplate tmplRenter = renterTemplates[0];
+                        String emailBodyRenter = 'Email sent to Renter using Template: ' + tmplRenter.Name +
+                                                 '\nSubject: ' + tmplRenter.Subject +
+                                                 '\nCase: ' + c.CaseNumber +
+                                                 '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm');
 
-                    ContentVersion cvRenter = new ContentVersion(
-                        Title = 'Email Confirmation (Renter) - ' + c.CaseNumber,
-                        PathOnClient = 'CaseEmailConfirmationRenter.txt',
-                        VersionData = Blob.valueOf(emailBodyRenter),
-                        Origin = 'H'
-                    );
-                    insert cvRenter;
+                        ContentVersion cvRenter = new ContentVersion(
+                            Title = 'Email Confirmation (Renter) - ' + c.CaseNumber,
+                            PathOnClient = 'CaseEmailConfirmationRenter.txt',
+                            VersionData = Blob.valueOf(emailBodyRenter),
+                            Origin = 'H'
+                        );
+                        insert cvRenter;
 
-                    ContentDocumentLink linkRenter = new ContentDocumentLink(
-                        ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cvRenter.Id].ContentDocumentId,
-                        LinkedEntityId = c.Id,
-                        ShareType = 'V',
-                        Visibility = 'AllUsers'
-                    );
-                    insert linkRenter;
+                        ContentDocumentLink linkRenter = new ContentDocumentLink(
+                            ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cvRenter.Id].ContentDocumentId,
+                            LinkedEntityId = c.Id,
+                            ShareType = 'V',
+                            Visibility = 'AllUsers'
+                        );
+                        insert linkRenter;
+                    }
                 }
 
-                // 10. Set Case to Closed after all processing
+                // 10. Set Case to Closed
                 c.Status = 'Closed';
                 update c;
 

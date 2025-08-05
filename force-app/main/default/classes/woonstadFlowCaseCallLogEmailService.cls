@@ -153,14 +153,15 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                 // 5. Determine ContactId for renter
                 Id renterContactId = acc.PersonContactId != null ? acc.PersonContactId : req.contactId;
 
-                // 6. Send Email to Supplier (logs via WhatId only)
+                // 6. Send Email to Supplier (log activity via UserId, tie to Case)
                 try {
                     if (!String.isBlank(supplierEmail) && req.supplierTemplateId != null) {
                         Messaging.SingleEmailMessage supplierMail = new Messaging.SingleEmailMessage();
                         supplierMail.setTemplateId(req.supplierTemplateId);
-                        supplierMail.setWhatId(c.Id); // logs on Case
+                        supplierMail.setWhatId(c.Id); // tie activity to Case
                         supplierMail.setSaveAsActivity(true);
-                        supplierMail.setToAddresses(new List<String>{ supplierEmail });
+                        supplierMail.setTargetObjectId(UserInfo.getUserId()); // log against current user for activity
+                        supplierMail.setToAddresses(new List<String>{ supplierEmail }); // send to supplier
                         Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ supplierMail });
                     }
                 } catch (Exception e) {

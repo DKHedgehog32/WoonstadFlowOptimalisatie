@@ -15,6 +15,7 @@
  *      (1) To the Supplier using supplierTemplateId
  *      (2) To the Renter using renterTemplateId
  * - Ensures both emails are logged to the Case activity history.
+ * - Uses TreatTargetObjectAsRecipient(false) to prevent the log user from receiving supplier emails.
  * - Logs email confirmations as ContentVersion linked to the Case.
  * - Updates the Case status to 'Closed' after successful processing.
  * - Copies Label__c from Account to Case.
@@ -153,15 +154,16 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                 // 5. Determine ContactId for renter
                 Id renterContactId = acc.PersonContactId != null ? acc.PersonContactId : req.contactId;
 
-                // 6. Send Email to Supplier (log activity via UserId, tie to Case)
+                // 6. Send Email to Supplier (logs activity but only sends to supplier)
                 try {
                     if (!String.isBlank(supplierEmail) && req.supplierTemplateId != null) {
                         Messaging.SingleEmailMessage supplierMail = new Messaging.SingleEmailMessage();
                         supplierMail.setTemplateId(req.supplierTemplateId);
-                        supplierMail.setWhatId(c.Id); // tie activity to Case
+                        supplierMail.setWhatId(c.Id); // tie to Case
                         supplierMail.setSaveAsActivity(true);
-                        supplierMail.setTargetObjectId(UserInfo.getUserId()); // log against current user for activity
-                        supplierMail.setToAddresses(new List<String>{ supplierEmail }); // send to supplier
+                        supplierMail.setTargetObjectId(UserInfo.getUserId()); // ensure Case activity logging
+                        supplierMail.setTreatTargetObjectAsRecipient(false);  // prevent adding user as recipient
+                        supplierMail.setToAddresses(new List<String>{ supplierEmail }); // supplier only
                         Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ supplierMail });
                     }
                 } catch (Exception e) {

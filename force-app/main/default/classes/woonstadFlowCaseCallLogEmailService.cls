@@ -14,7 +14,9 @@
  * - Sends two emails:
  *      (1) To the Supplier using supplierTemplateId
  *      (2) To the Renter using renterTemplateId
- * - Supplier email is logged manually as a Task for guaranteed Case activity visibility.
+ * - Logs supplier emails manually as EmailMessage records tied to the Case,
+ *   ensuring they appear in the Case activity timeline.
+ * - Renter emails use standard Flow logging.
  * - Logs email confirmations as ContentVersion linked to the Case.
  * - Updates the Case status to 'Closed' after successful processing.
  * - Copies Label__c from Account to Case.
@@ -153,34 +155,38 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                 // 5. Determine ContactId for renter
                 Id renterContactId = acc.PersonContactId != null ? acc.PersonContactId : req.contactId;
 
-                // 6. Send Email to Supplier (send + manually log Task)
+                // 6. Send Email to Supplier (send + manually log EmailMessage)
                 try {
                     if (!String.isBlank(supplierEmail) && req.supplierTemplateId != null) {
+                        // Send actual supplier email
                         Messaging.SingleEmailMessage supplierMail = new Messaging.SingleEmailMessage();
                         supplierMail.setTemplateId(req.supplierTemplateId);
                         supplierMail.setWhatId(c.Id); 
-                        supplierMail.setSaveAsActivity(false); // prevent broken auto-logging
+                        supplierMail.setSaveAsActivity(false); // disable auto-log
                         supplierMail.setToAddresses(new List<String>{ supplierEmail });
                         Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ supplierMail });
 
-                        // Manually log activity to Case
-                        Task supplierTask = new Task(
-                            WhatId = c.Id,
-                            OwnerId = runningUserId,
-                            Subject = 'Email sent to Supplier: ' + supplierName,
-                            Status = 'Completed',
-                            Priority = 'Normal',
-                            Description = 'Supplier Email sent to: ' + supplierEmail +
+                        // Manually log supplier email as EmailMessage
+                        EmailMessage em = new EmailMessage(
+                            ParentId    = c.Id,
+                            Status      = '3', // Sent
+                            FromAddress = UserInfo.getUserEmail(),
+                            FromName    = UserInfo.getName(),
+                            ToAddress   = supplierEmail,
+                            Subject     = 'Email sent to Supplier: ' + supplierName,
+                            TextBody    = 'Supplier Email sent to: ' + supplierEmail +
                                           '\nTemplate: ' + req.supplierTemplateId +
-                                          '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm')
+                                          '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm'),
+                            MessageDate = System.now(),
+                            Incoming    = false
                         );
-                        insert supplierTask;
+                        insert em;
                     }
                 } catch (Exception e) {
                     System.debug('Email to supplier skipped or failed: ' + e.getMessage());
                 }
 
-                // 7. Send Email to Renter (logs on Case + Contact)
+                // 7. Send Email to Renter (logs via TargetObjectId)
                 try {
                     if (!String.isBlank(acc.PersonEmail) && req.renterTemplateId != null) {
                         Messaging.SingleEmailMessage renterMail = new Messaging.SingleEmailMessage();

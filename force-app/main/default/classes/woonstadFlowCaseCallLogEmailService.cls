@@ -14,9 +14,9 @@
  * - Sends two emails:
  *      (1) To the Supplier using supplierTemplateId
  *      (2) To the Renter using renterTemplateId
- * - Logs supplier emails manually as EmailMessage records tied to the Case,
- *   ensuring they appear in the Case activity timeline.
- * - Renter emails use standard Flow logging.
+ * - Supplier emails are logged manually as EmailMessage records tied to the Case,
+ *   ensuring they appear in the Case activity feed.
+ * - Renter emails use standard Flow logging with TargetObjectId.
  * - Logs email confirmations as ContentVersion linked to the Case.
  * - Updates the Case status to 'Closed' after successful processing.
  * - Copies Label__c from Account to Case.
@@ -168,17 +168,18 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
 
                         // Manually log supplier email as EmailMessage
                         EmailMessage em = new EmailMessage(
-                            ParentId    = c.Id,
-                            Status      = '3', // Sent
-                            FromAddress = UserInfo.getUserEmail(),
-                            FromName    = UserInfo.getName(),
-                            ToAddress   = supplierEmail,
-                            Subject     = 'Email sent to Supplier: ' + supplierName,
-                            TextBody    = 'Supplier Email sent to: ' + supplierEmail +
-                                          '\nTemplate: ' + req.supplierTemplateId +
-                                          '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm'),
-                            MessageDate = System.now(),
-                            Incoming    = false
+                            ParentId     = c.Id,
+                            Status       = '3', // Sent
+                            MessageType  = 'Email', // required for Case feed
+                            FromAddress  = UserInfo.getUserEmail(),
+                            FromName     = UserInfo.getName(),
+                            ToAddress    = supplierEmail,
+                            Subject      = 'Email sent to Supplier: ' + supplierName,
+                            TextBody     = 'Supplier Email sent to: ' + supplierEmail +
+                                           '\nTemplate: ' + req.supplierTemplateId +
+                                           '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm'),
+                            MessageDate  = System.now(),
+                            Incoming     = false
                         );
                         insert em;
                     }

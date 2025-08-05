@@ -12,10 +12,12 @@
  *      Supplier display name & email used for sending.
  * - Always includes static Weijntjes Hang- En Sluitwerk.
  * - Sends two emails:
- *      (1) To the Supplier using supplierTemplateId (TargetObjectId = renter)
+ *      (1) To the Supplier using supplierTemplateId 
+ *          (manual logging with dynamic merge)
  *      (2) To the Renter using renterTemplateId
- * - Both emails are logged in the Case activity feed using SaveAsActivity(true).
- * - Logs email confirmations as ContentVersion linked to the Case.
+ *          (native logging with SaveAsActivity)
+ * - Supplier emails are logged as EmailMessage + ContentVersion
+ *   with full template content (merge resolved).
  * - Updates the Case status to 'Closed' after successful processing.
  * - Copies Label__c from Account to Case.
  */
@@ -24,7 +26,7 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
     // ========== Flow Input ==========
     public class Request {
         @InvocableVariable(required=true) public Id accountId;
-        @InvocableVariable(required=true) public Id contactId; // AccountId if Person Account
+        @InvocableVariable(required=true) public Id contactId; 
         @InvocableVariable(required=true) public Id supplierTemplateId;
         @InvocableVariable(required=true) public Id renterTemplateId;
         @InvocableVariable(required=true) public String caseOrigin;
@@ -42,7 +44,7 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
         @InvocableVariable public Id requestId;
         @InvocableVariable public String status;
 
-        // Dynamic Supplier outputs
+        // Supplier outputs
         @InvocableVariable public String supplierApiName;
         @InvocableVariable public String supplierName;
         @InvocableVariable public String supplierEmail;
@@ -57,11 +59,10 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
     @InvocableMethod(label='Create Case, Request, and Send Email')
     public static List<Response> execute(List<Request> requests) {
         List<Response> results = new List<Response>();
-
+        
         for (Request req : requests) {
             Response res = new Response();
             try {
-                // Track Flow execution time
                 Datetime startTime;
                 Integer processMinutes = 0;
                 if (String.isNotBlank(req.flowStartTime)) {
@@ -70,11 +71,11 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                         Long diffMillis = Datetime.now().getTime() - startTime.getTime();
                         processMinutes = Integer.valueOf(Math.floor((Decimal)diffMillis / (1000 * 60)));
                     } catch (Exception e) {
-                        System.debug('Could not parse flowStartTime: ' + req.flowStartTime + ' | ' + e.getMessage());
+                        System.debug('Could not parse flowStartTime: ' + e.getMessage());
                     }
                 }
 
-                // Fetch Account data (added Label__c)
+                // Fetch Account
                 Account acc = [
                     SELECT Id, Name, PersonEmail,
                            Full_Shipping_Street__c,
@@ -88,21 +89,16 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                     LIMIT 1
                 ];
 
-                // Build Case subject/description
-                String subjectText = 'Aanvraag naamplaatje voor ' + acc.Full_Shipping_Street__c;
-                String descriptionText = 'Aanvraag naamplaatje voor:' + '\n'
-                    + (acc.Full_Shipping_Street__c != null ? acc.Full_Shipping_Street__c : '') + '\n'
-                    + (acc.Full_Shipping_Postal_Code__c != null ? acc.Full_Shipping_Postal_Code__c : '') + '\n'
-                    + (acc.Full_Shipping_City__c != null ? acc.Full_Shipping_City__c : '') + '\n'
-                    + (acc.Full_Shipping_Country__c != null ? acc.Full_Shipping_Country__c : '') + '\n'
-                    + 'Aangevraagd door ' + acc.Name;
-
+                // Create Case
                 Id runningUserId = UserInfo.getUserId();
-
-                // 1. Create Case (populate Label__c)
                 Case c = new Case(
-                    Subject = subjectText,
-                    Description = descriptionText,
+                    Subject = 'Aanvraag naamplaatje voor ' + acc.Full_Shipping_Street__c,
+                    Description = 'Aanvraag naamplaatje voor:\n' +
+                                  (acc.Full_Shipping_Street__c != null ? acc.Full_Shipping_Street__c + '\n' : '') +
+                                  (acc.Full_Shipping_Postal_Code__c != null ? acc.Full_Shipping_Postal_Code__c + '\n' : '') +
+                                  (acc.Full_Shipping_City__c != null ? acc.Full_Shipping_City__c + '\n' : '') +
+                                  (acc.Full_Shipping_Country__c != null ? acc.Full_Shipping_Country__c + '\n' : '') +
+                                  'Aangevraagd door ' + acc.Name,
                     OwnerId = runningUserId,
                     AccountId = req.accountId,
                     Origin = req.caseOrigin,
@@ -112,12 +108,11 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                 );
                 insert c;
 
-                // 2. Get Supplier info from RealEstateSupplierFlowController
+                // Supplier info
                 RealEstateSupplierFlowController.SupplierWrapper supplier =
                     RealEstateSupplierFlowController.getFirstSupplier(req.accountId);
 
-                // Prefer Flow input if provided, fallback to Apex logic
-                String supplierApiName = (supplier != null ? supplier.supplierApiName : null);
+                String supplierApiName = supplier != null ? supplier.supplierApiName : null;
                 String supplierName    = !String.isBlank(req.supplierNameInput) 
                                           ? req.supplierNameInput 
                                           : (supplier != null ? supplier.supplierName : null);
@@ -125,12 +120,12 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                                           ? req.supplierEmailInput 
                                           : (supplier != null ? supplier.supplierEmail : null);
 
-                // Static Weijntjes (always returned)
-                String weijntjesApiName = (supplier != null ? supplier.weijntjesApiName : 'Weijntjes Hang- En Sluitwerk');
-                String weijntjesName    = (supplier != null ? supplier.weijntjesName : 'Weijntjes Hang- En Sluitwerk');
-                String weijntjesEmail   = (supplier != null ? supplier.weijntjesEmail : 'dennis.kristoffers@cobracrm.nl');
+                // Static Weijntjes fallback
+                String weijntjesApiName = supplier != null ? supplier.weijntjesApiName : 'Weijntjes Hang- En Sluitwerk';
+                String weijntjesName    = supplier != null ? supplier.weijntjesName : 'Weijntjes Hang- En Sluitwerk';
+                String weijntjesEmail   = supplier != null ? supplier.weijntjesEmail : 'dennis.kristoffers@cobracrm.nl';
 
-                // 3. Create Request__c record
+                // Create Request
                 Request__c r = new Request__c(
                     Account__c = req.accountId,
                     Case__c = c.Id,
@@ -146,40 +141,54 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                 );
                 insert r;
 
-                // 4. Link Request back to Case
                 c.Request__c = r.Id;
                 update c;
 
-                // 5. Determine renter TargetObjectId
+                // Determine renter target
                 Id renterTargetId = acc.PersonContactId != null ? acc.PersonContactId : req.contactId;
-                if (renterTargetId == null) {
-                    renterTargetId = UserInfo.getUserId(); // fallback
-                }
+                if (renterTargetId == null) renterTargetId = UserInfo.getUserId();
 
-                // 6. Send Email to Supplier (auto-log with SaveAsActivity)
+                // ---- Supplier Email ----
                 try {
                     if (!String.isBlank(supplierEmail) && req.supplierTemplateId != null) {
+                        // Send supplier email without TargetObjectId
                         Messaging.SingleEmailMessage supplierMail = new Messaging.SingleEmailMessage();
                         supplierMail.setTemplateId(req.supplierTemplateId);
-                        supplierMail.setWhatId(c.Id); 
-                        supplierMail.setTargetObjectId(renterTargetId); // Trick: renter used for merge & logging
-                        supplierMail.setSaveAsActivity(true); // Auto-log in Case Activity
+                        supplierMail.setWhatId(c.Id);
+                        supplierMail.setSaveAsActivity(false); 
                         supplierMail.setToAddresses(new List<String>{ supplierEmail });
                         Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ supplierMail });
 
-                        System.debug('Supplier email sent and auto-logged in Case Activity');
-
-                        // ContentVersion logging for Supplier
+                        // Merge template content
                         EmailTemplate tmplSupplier = [
-                            SELECT Id, Name, DeveloperName, Subject, Description
+                            SELECT Id, Subject, HtmlValue, Body
                             FROM EmailTemplate
                             WHERE Id = :req.supplierTemplateId
                             LIMIT 1
                         ];
-                        String emailBodySupplier = 'Email sent to Supplier using Template: ' + tmplSupplier.Name +
-                                                   '\nSubject: ' + tmplSupplier.Subject +
-                                                   '\nCase: ' + c.CaseNumber +
-                                                   '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm');
+                        String mergedSubject = resolveTemplateFields(tmplSupplier.Subject, acc, c);
+                        String mergedBody = resolveTemplateFields(
+                            tmplSupplier.Body != null ? tmplSupplier.Body : tmplSupplier.HtmlValue, acc, c
+                        );
+
+                        // Log EmailMessage
+                        EmailMessage em = new EmailMessage(
+                            ParentId    = c.Id,
+                            Status      = '3',
+                            FromAddress = UserInfo.getUserEmail(),
+                            FromName    = UserInfo.getName(),
+                            ToAddress   = supplierEmail,
+                            Subject     = mergedSubject,
+                            TextBody    = mergedBody,
+                            MessageDate = System.now(),
+                            Incoming    = false
+                        );
+                        insert em;
+
+                        // Log ContentVersion
+                        String emailBodySupplier = 'Email sent to Supplier: ' + supplierEmail +
+                                                   '\nSubject: ' + mergedSubject +
+                                                   '\n\n' + mergedBody;
                         ContentVersion cvSupplier = new ContentVersion(
                             Title = 'Email Confirmation (Supplier) - ' + c.CaseNumber,
                             PathOnClient = 'CaseEmailConfirmationSupplier.txt',
@@ -196,10 +205,10 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                         insert linkSupplier;
                     }
                 } catch (Exception e) {
-                    System.debug('Email to supplier skipped or failed: ' + e.getMessage());
+                    System.debug('Supplier email failed: ' + e.getMessage());
                 }
 
-                // 7. Send Email to Renter (auto-log with SaveAsActivity)
+                // ---- Renter Email ----
                 try {
                     if (!String.isBlank(acc.PersonEmail) && req.renterTemplateId != null) {
                         Messaging.SingleEmailMessage renterMail = new Messaging.SingleEmailMessage();
@@ -210,17 +219,21 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                         renterMail.setToAddresses(new List<String>{ acc.PersonEmail });
                         Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ renterMail });
 
-                        // ContentVersion logging for Renter
+                        // ContentVersion log
                         EmailTemplate tmplRenter = [
-                            SELECT Id, Name, DeveloperName, Subject, Description
+                            SELECT Id, Subject, HtmlValue, Body
                             FROM EmailTemplate
                             WHERE Id = :req.renterTemplateId
                             LIMIT 1
                         ];
-                        String emailBodyRenter = 'Email sent to Renter using Template: ' + tmplRenter.Name +
-                                                 '\nSubject: ' + tmplRenter.Subject +
-                                                 '\nCase: ' + c.CaseNumber +
-                                                 '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm');
+                        String mergedSubjectR = resolveTemplateFields(tmplRenter.Subject, acc, c);
+                        String mergedBodyR = resolveTemplateFields(
+                            tmplRenter.Body != null ? tmplRenter.Body : tmplRenter.HtmlValue, acc, c
+                        );
+
+                        String emailBodyRenter = 'Email sent to Renter: ' + acc.PersonEmail +
+                                                 '\nSubject: ' + mergedSubjectR +
+                                                 '\n\n' + mergedBodyR;
                         ContentVersion cvRenter = new ContentVersion(
                             Title = 'Email Confirmation (Renter) - ' + c.CaseNumber,
                             PathOnClient = 'CaseEmailConfirmationRenter.txt',
@@ -237,14 +250,14 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                         insert linkRenter;
                     }
                 } catch (Exception e) {
-                    System.debug('Email to renter skipped or failed: ' + e.getMessage());
+                    System.debug('Renter email failed: ' + e.getMessage());
                 }
 
-                // 8. Set Case to Closed
+                // Close Case
                 c.Status = 'Closed';
                 update c;
 
-                // 9. Populate Response
+                // Response
                 res.caseId = c.Id;
                 res.requestId = r.Id;
                 res.status = 'SUCCESS';
@@ -262,5 +275,26 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
             results.add(res);
         }
         return results;
+    }
+
+    // Utility: Replace merge fields dynamically
+    private static String resolveTemplateFields(String template, Account acc, Case c) {
+        if (String.isBlank(template)) return '';
+        Map<String, String> values = new Map<String, String>{
+            '{!Account.Name}' => acc.Name,
+            '{!Account.PersonEmail}' => acc.PersonEmail,
+            '{!Account.Full_Shipping_Street__c}' => acc.Full_Shipping_Street__c,
+            '{!Account.Full_Shipping_Postal_Code__c}' => acc.Full_Shipping_Postal_Code__c,
+            '{!Account.Full_Shipping_City__c}' => acc.Full_Shipping_City__c,
+            '{!Account.Full_Shipping_Country__c}' => acc.Full_Shipping_Country__c,
+            '{!Account.Label__c}' => acc.Label__c,
+            '{!Case.Subject}' => c.Subject,
+            '{!Case.Description}' => c.Description,
+            '{!Case.Nameplate_Text__c}' => c.Nameplate_Text__c
+        };
+        for (String key : values.keySet()) {
+            template = template.replace(key, values.get(key) != null ? values.get(key) : '');
+        }
+        return template;
     }
 }

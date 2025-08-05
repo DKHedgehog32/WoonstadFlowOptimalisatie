@@ -3,37 +3,36 @@
     =============================================
     Woonstad Flow Supplier - Meta XML
     =============================================
-    Date: 2025-07-31
-    Last Changed: 2025-07-31
+    Date: 2025-08-05
+    Last Changed: 2025-08-05
     Description:
-    Exposes the Woonstad Flow Supplier Lightning 
-    Web Component for use in Flow Screens.
-    Provides supplier details (klantNaam, eigenaar, 
-    supplierName, supplierEmail) based on an Account Id.
+    Exposes the component for Flow Screens.
+    Allows toggling between Supplier and Account data
+    with validation for mandatory address fields.
 -->
 
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
-    <!-- Current Salesforce API version -->
     <apiVersion>60.0</apiVersion>
-
-    <!-- Expose component to Flow Builder -->
     <isExposed>true</isExposed>
-
-    <!-- Display name inside Flow Builder -->
-    <masterLabel>Woonstad Flow Supplier</masterLabel>
-
-    <!-- Supported target: Flow Screens -->
+    <masterLabel>Woonstad Flow Supplier or Account</masterLabel>
     <targets>
         <target>lightning__FlowScreen</target>
     </targets>
-
-    <!-- Configure Flow properties -->
     <targetConfigs>
         <targetConfig targets="lightning__FlowScreen">
-            <!-- Input: Account Id passed from Flow -->
+
+            <!-- Toggle: true = show account data, false = supplier -->
+            <property name="showAccountData" type="Boolean" label="Show Account Data?" role="inputOnly"/>
+
+            <!-- Account context -->
             <property name="accountId" type="String" label="Account Id" role="inputOnly"/>
 
-            <!-- Outputs: Supplier information returned to Flow -->
+            <!-- Inputs: Required when showAccountData is true -->
+            <property name="shippingStreet" type="String" label="Shipping Street" role="inputOnly"/>
+            <property name="shippingPostalCode" type="String" label="Shipping Postal Code" role="inputOnly"/>
+            <property name="shippingCity" type="String" label="Shipping City" role="inputOnly"/>
+
+            <!-- Outputs: Supplier information -->
             <property name="klantNaam" type="String" label="Klant Naam" role="outputOnly"/>
             <property name="eigenaar" type="String" label="Eigenaar" role="outputOnly"/>
             <property name="supplierName" type="String" label="Supplier" role="outputOnly"/>

@@ -2,61 +2,78 @@
  * =============================================
  * WoonstadFlowSupplier.js
  * =============================================
- * Date: 2025-07-31
- * Last Changed: 2025-07-31
+ * Date: 2025-08-05
+ * Last Changed: 2025-08-05
  * Description:
- * Lightning Web Component for retrieving supplier 
- * information in a Flow based on an Account Id.
- * - Calls Apex RealEstateSupplierFlowController.getFirstSupplier.
- * - Outputs KlantNaam, Eigenaar, SupplierName, and SupplierEmail 
- *   for use in Flow.
- * - Flags noSupplierFound when no supplier is available.
+ * Lightning Web Component that toggles between 
+ * displaying Supplier data (via Apex) and 
+ * Account Shipping Address data (via Flow inputs).
+ * - If showAccountData = true → requires Shipping fields.
+ * - Includes Flow validation and inline error display.
  */
 
 import { LightningElement, api, wire, track } from 'lwc';
 import getFirstSupplier from '@salesforce/apex/RealEstateSupplierFlowController.getFirstSupplier';
 
 export default class WoonstadFlowSupplier extends LightningElement {
-    // Input provided by Flow
-    @api accountId;
+    // ========== Inputs from Flow ==========
+    @api accountId;            // Used for supplier lookup
+    @api showAccountData;      // Boolean: true = show account shipping, false = show supplier
 
-    // Outputs for Flow
-    @api klantNaam;      // Account Name
-    @api eigenaar;       // Contract party name
-    @api supplierName;   // Determined supplier name
-    @api supplierEmail;  // Determined supplier email
+    // Account Shipping data (required when showAccountData = true)
+    @api shippingStreet;
+    @api shippingPostalCode;
+    @api shippingCity;
 
-    // Flag for conditional handling in Flow
-    @track noSupplierFound = false;
+    // ========== Supplier Data (from Apex) ==========
+    @api klantNaam;       // Account name
+    @api eigenaar;        // Contract party name
+    @api supplierName;    // Supplier name
+    @api supplierEmail;   // Supplier email
+
+    // ========== UI State ==========
+    @track noSupplierFound = false;   // True if no supplier is available
+    @track errorMessage = '';         // Error message to show under shipping address
 
     /**
-     * Wire method to call Apex and retrieve supplier info
-     * based on the provided Account Id.
+     * Wire to fetch supplier data only when we need supplier info
      */
     @wire(getFirstSupplier, { accountId: '$accountId' })
     wiredSupplier({ error, data }) {
-        console.log('WoonstadFlowSupplier called with accountId:', this.accountId);
+        if (!this.showAccountData) { // skip if we are showing account data
+            if (data) {
+                // Map data from Apex response
+                this.klantNaam = data.klantNaam;
+                this.eigenaar = data.eigenaar;
+                this.supplierName = data.supplierName;
+                this.supplierEmail = data.supplierEmail;
 
-        if (data) {
-            console.log('Data received from Apex:', JSON.stringify(data));
-
-            // Map Apex response to Flow variables
-            this.klantNaam = data.klantNaam;
-            this.eigenaar = data.eigenaar;
-            this.supplierName = data.supplierName;
-            this.supplierEmail = data.supplierEmail;
-
-            // Flag if supplier or klantNaam is missing
-            this.noSupplierFound = !(this.supplierName && this.klantNaam);
-
-            // Debug output
-            console.log('Klant Naam:', this.klantNaam);
-            console.log('Eigenaar:', this.eigenaar);
-            console.log('Supplier:', this.supplierName);
-            console.log('Email:', this.supplierEmail);
-        } else if (error) {
-            console.error('Error from Apex:', JSON.stringify(error));
-            this.noSupplierFound = true;
+                // Supplier must exist and have klantNaam
+                this.noSupplierFound = !(this.supplierName && this.klantNaam);
+            } else if (error) {
+                console.error('Error from Apex:', JSON.stringify(error));
+                this.noSupplierFound = true;
+            }
         }
+    }
+
+    /**
+     * Flow validation method:
+     * Called automatically when Flow attempts to go to the next screen.
+     * Prevents navigation if account data is shown but required fields are missing.
+     */
+    @api
+    validate() {
+        if (this.showAccountData) {
+            if (!this.shippingStreet || !this.shippingPostalCode || !this.shippingCity) {
+                this.errorMessage = 'Alle adresvelden zijn verplicht wanneer accountgegevens worden weergegeven.';
+                return {
+                    isValid: false,
+                    errorMessage: this.errorMessage
+                };
+            }
+        }
+        this.errorMessage = ''; // clear previous error if valid
+        return { isValid: true };
     }
 }

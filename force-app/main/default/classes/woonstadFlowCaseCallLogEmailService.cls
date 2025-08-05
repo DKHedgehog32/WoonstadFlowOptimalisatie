@@ -170,7 +170,6 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                         EmailMessage em = new EmailMessage(
                             ParentId     = c.Id,
                             Status       = '3', // Sent
-                            MessageType  = 'Email', // required for Case feed
                             FromAddress  = UserInfo.getUserEmail(),
                             FromName     = UserInfo.getName(),
                             ToAddress    = supplierEmail,
@@ -182,6 +181,8 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                             Incoming     = false
                         );
                         insert em;
+
+                        System.debug('Supplier EmailMessage logged with Id: ' + em.Id);
                     }
                 } catch (Exception e) {
                     System.debug('Email to supplier skipped or failed: ' + e.getMessage());

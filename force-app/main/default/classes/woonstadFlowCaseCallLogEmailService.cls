@@ -12,10 +12,9 @@
  *      Supplier display name & email used for sending.
  * - Always includes static Weijntjes Hang- En Sluitwerk.
  * - Sends two emails:
- *      (1) To the Supplier using supplierTemplateId
+ *      (1) To the Supplier using supplierTemplateId (TargetObjectId = renter)
  *      (2) To the Renter using renterTemplateId
- * - Supplier emails are logged manually as EmailMessage records tied to the Case,
- *   ensuring they appear in the Case activity feed.
+ * - Supplier emails are logged manually as EmailMessage records tied to the Case.
  * - Renter emails use standard Flow logging with TargetObjectId.
  * - Logs email confirmations as ContentVersion linked to the Case.
  * - Updates the Case status to 'Closed' after successful processing.
@@ -152,24 +151,27 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                 c.Request__c = r.Id;
                 update c;
 
-                // 5. Determine ContactId for renter
-                Id renterContactId = acc.PersonContactId != null ? acc.PersonContactId : req.contactId;
+                // 5. Use renter as TargetObjectId for supplier email
+                Id renterTargetId = acc.PersonContactId != null ? acc.PersonContactId : req.contactId;
+                if (renterTargetId == null) {
+                    renterTargetId = UserInfo.getUserId(); // fallback
+                }
 
-                // 6. Send Email to Supplier (send + manually log EmailMessage)
+                // 6. Send Email to Supplier
                 try {
                     if (!String.isBlank(supplierEmail) && req.supplierTemplateId != null) {
-                        // Send actual supplier email
                         Messaging.SingleEmailMessage supplierMail = new Messaging.SingleEmailMessage();
                         supplierMail.setTemplateId(req.supplierTemplateId);
                         supplierMail.setWhatId(c.Id); 
-                        supplierMail.setSaveAsActivity(false); // disable auto-log
+                        supplierMail.setTargetObjectId(renterTargetId);
+                        supplierMail.setSaveAsActivity(false);
                         supplierMail.setToAddresses(new List<String>{ supplierEmail });
                         Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ supplierMail });
 
-                        // Manually log supplier email as EmailMessage
+                        // Manually log supplier email
                         EmailMessage em = new EmailMessage(
                             ParentId     = c.Id,
-                            Status       = '3', // Sent
+                            Status       = '3',
                             FromAddress  = UserInfo.getUserEmail(),
                             FromName     = UserInfo.getName(),
                             ToAddress    = supplierEmail,
@@ -182,44 +184,17 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                         );
                         insert em;
 
-                        System.debug('Supplier EmailMessage logged with Id: ' + em.Id);
-                    }
-                } catch (Exception e) {
-                    System.debug('Email to supplier skipped or failed: ' + e.getMessage());
-                }
-
-                // 7. Send Email to Renter (logs via TargetObjectId)
-                try {
-                    if (!String.isBlank(acc.PersonEmail) && req.renterTemplateId != null) {
-                        Messaging.SingleEmailMessage renterMail = new Messaging.SingleEmailMessage();
-                        renterMail.setTemplateId(req.renterTemplateId);
-                        renterMail.setWhatId(c.Id);
-                        renterMail.setSaveAsActivity(true);
-                        if (renterContactId != null) {
-                            renterMail.setTargetObjectId(renterContactId);
-                        }
-                        renterMail.setToAddresses(new List<String>{ acc.PersonEmail });
-                        Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ renterMail });
-                    }
-                } catch (Exception e) {
-                    System.debug('Email to renter skipped or failed: ' + e.getMessage());
-                }
-
-                // 8. Save Email Confirmation for Supplier
-                if (req.supplierTemplateId != null) {
-                    List<EmailTemplate> supplierTemplates = [
-                        SELECT Id, Name, DeveloperName, Subject, Description
-                        FROM EmailTemplate
-                        WHERE Id = :req.supplierTemplateId
-                        LIMIT 1
-                    ];
-                    if (!supplierTemplates.isEmpty()) {
-                        EmailTemplate tmplSupplier = supplierTemplates[0];
+                        // ContentVersion logging for Supplier
+                        EmailTemplate tmplSupplier = [
+                            SELECT Id, Name, DeveloperName, Subject, Description
+                            FROM EmailTemplate
+                            WHERE Id = :req.supplierTemplateId
+                            LIMIT 1
+                        ];
                         String emailBodySupplier = 'Email sent to Supplier using Template: ' + tmplSupplier.Name +
                                                    '\nSubject: ' + tmplSupplier.Subject +
                                                    '\nCase: ' + c.CaseNumber +
                                                    '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm');
-
                         ContentVersion cvSupplier = new ContentVersion(
                             Title = 'Email Confirmation (Supplier) - ' + c.CaseNumber,
                             PathOnClient = 'CaseEmailConfirmationSupplier.txt',
@@ -227,7 +202,6 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                             Origin = 'H'
                         );
                         insert cvSupplier;
-
                         ContentDocumentLink linkSupplier = new ContentDocumentLink(
                             ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cvSupplier.Id].ContentDocumentId,
                             LinkedEntityId = c.Id,
@@ -236,23 +210,32 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                         );
                         insert linkSupplier;
                     }
+                } catch (Exception e) {
+                    System.debug('Email to supplier skipped or failed: ' + e.getMessage());
                 }
 
-                // 9. Save Email Confirmation for Renter
-                if (req.renterTemplateId != null) {
-                    List<EmailTemplate> renterTemplates = [
-                        SELECT Id, Name, DeveloperName, Subject, Description
-                        FROM EmailTemplate
-                        WHERE Id = :req.renterTemplateId
-                        LIMIT 1
-                    ];
-                    if (!renterTemplates.isEmpty()) {
-                        EmailTemplate tmplRenter = renterTemplates[0];
+                // 7. Send Email to Renter
+                try {
+                    if (!String.isBlank(acc.PersonEmail) && req.renterTemplateId != null) {
+                        Messaging.SingleEmailMessage renterMail = new Messaging.SingleEmailMessage();
+                        renterMail.setTemplateId(req.renterTemplateId);
+                        renterMail.setWhatId(c.Id);
+                        renterMail.setSaveAsActivity(true);
+                        renterMail.setTargetObjectId(renterTargetId);
+                        renterMail.setToAddresses(new List<String>{ acc.PersonEmail });
+                        Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ renterMail });
+
+                        // ContentVersion logging for Renter
+                        EmailTemplate tmplRenter = [
+                            SELECT Id, Name, DeveloperName, Subject, Description
+                            FROM EmailTemplate
+                            WHERE Id = :req.renterTemplateId
+                            LIMIT 1
+                        ];
                         String emailBodyRenter = 'Email sent to Renter using Template: ' + tmplRenter.Name +
                                                  '\nSubject: ' + tmplRenter.Subject +
                                                  '\nCase: ' + c.CaseNumber +
                                                  '\nDate: ' + Datetime.now().format('yyyy-MM-dd HH:mm');
-
                         ContentVersion cvRenter = new ContentVersion(
                             Title = 'Email Confirmation (Renter) - ' + c.CaseNumber,
                             PathOnClient = 'CaseEmailConfirmationRenter.txt',
@@ -260,7 +243,6 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                             Origin = 'H'
                         );
                         insert cvRenter;
-
                         ContentDocumentLink linkRenter = new ContentDocumentLink(
                             ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cvRenter.Id].ContentDocumentId,
                             LinkedEntityId = c.Id,
@@ -269,13 +251,15 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                         );
                         insert linkRenter;
                     }
+                } catch (Exception e) {
+                    System.debug('Email to renter skipped or failed: ' + e.getMessage());
                 }
 
-                // 10. Set Case to Closed
+                // 8. Set Case to Closed
                 c.Status = 'Closed';
                 update c;
 
-                // 11. Populate Response
+                // 9. Populate Response
                 res.caseId = c.Id;
                 res.requestId = r.Id;
                 res.status = 'SUCCESS';

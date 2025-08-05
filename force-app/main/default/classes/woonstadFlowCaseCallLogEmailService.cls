@@ -12,13 +12,12 @@
  *      Supplier display name & email used for sending.
  * - Always includes static Weijntjes Hang- En Sluitwerk.
  * - Sends two emails:
- *      (1) To the Supplier using supplierTemplateId 
- *          (manual logging with dynamic merge)
- *      (2) To the Renter using renterTemplateId
- *          (native logging with SaveAsActivity)
- * - Supplier emails are logged as EmailMessage + ContentVersion
- *   with full template content (merge resolved).
- * - Updates the Case status to 'Closed' after successful processing.
+ *      (1) To the Supplier using supplierTemplateId
+ *          (TargetObjectId renter + treatTargetObjectAsRecipient=false)
+ *      (2) To the Renter using renterTemplateId (native logging)
+ * - Supplier emails are logged as EmailMessage + ContentVersion.
+ * - Renter emails auto-log via SaveAsActivity.
+ * - Updates the Case status to 'Closed'.
  * - Copies Label__c from Account to Case.
  */
 public with sharing class woonstadFlowCaseCallLogEmailService {
@@ -151,15 +150,16 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                 // ---- Supplier Email ----
                 try {
                     if (!String.isBlank(supplierEmail) && req.supplierTemplateId != null) {
-                        // Send supplier email without TargetObjectId
                         Messaging.SingleEmailMessage supplierMail = new Messaging.SingleEmailMessage();
                         supplierMail.setTemplateId(req.supplierTemplateId);
                         supplierMail.setWhatId(c.Id);
-                        supplierMail.setSaveAsActivity(false); 
+                        supplierMail.setTargetObjectId(renterTargetId); // Required for merge
+                        supplierMail.setTreatTargetObjectAsRecipient(false); // Prevent renter delivery
+                        supplierMail.setSaveAsActivity(false); // We log manually
                         supplierMail.setToAddresses(new List<String>{ supplierEmail });
                         Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ supplierMail });
 
-                        // Merge template content
+                        // Log manually as EmailMessage
                         EmailTemplate tmplSupplier = [
                             SELECT Id, Subject, HtmlValue, Body
                             FROM EmailTemplate
@@ -171,7 +171,6 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                             tmplSupplier.Body != null ? tmplSupplier.Body : tmplSupplier.HtmlValue, acc, c
                         );
 
-                        // Log EmailMessage
                         EmailMessage em = new EmailMessage(
                             ParentId    = c.Id,
                             Status      = '3',
@@ -185,7 +184,7 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                         );
                         insert em;
 
-                        // Log ContentVersion
+                        // ContentVersion logging
                         String emailBodySupplier = 'Email sent to Supplier: ' + supplierEmail +
                                                    '\nSubject: ' + mergedSubject +
                                                    '\n\n' + mergedBody;
@@ -218,36 +217,6 @@ public with sharing class woonstadFlowCaseCallLogEmailService {
                         renterMail.setTargetObjectId(renterTargetId);
                         renterMail.setToAddresses(new List<String>{ acc.PersonEmail });
                         Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ renterMail });
-
-                        // ContentVersion log
-                        EmailTemplate tmplRenter = [
-                            SELECT Id, Subject, HtmlValue, Body
-                            FROM EmailTemplate
-                            WHERE Id = :req.renterTemplateId
-                            LIMIT 1
-                        ];
-                        String mergedSubjectR = resolveTemplateFields(tmplRenter.Subject, acc, c);
-                        String mergedBodyR = resolveTemplateFields(
-                            tmplRenter.Body != null ? tmplRenter.Body : tmplRenter.HtmlValue, acc, c
-                        );
-
-                        String emailBodyRenter = 'Email sent to Renter: ' + acc.PersonEmail +
-                                                 '\nSubject: ' + mergedSubjectR +
-                                                 '\n\n' + mergedBodyR;
-                        ContentVersion cvRenter = new ContentVersion(
-                            Title = 'Email Confirmation (Renter) - ' + c.CaseNumber,
-                            PathOnClient = 'CaseEmailConfirmationRenter.txt',
-                            VersionData = Blob.valueOf(emailBodyRenter),
-                            Origin = 'H'
-                        );
-                        insert cvRenter;
-                        ContentDocumentLink linkRenter = new ContentDocumentLink(
-                            ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cvRenter.Id].ContentDocumentId,
-                            LinkedEntityId = c.Id,
-                            ShareType = 'V',
-                            Visibility = 'AllUsers'
-                        );
-                        insert linkRenter;
                     }
                 } catch (Exception e) {
                     System.debug('Renter email failed: ' + e.getMessage());

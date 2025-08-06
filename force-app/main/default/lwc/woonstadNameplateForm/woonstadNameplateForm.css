@@ -1,0 +1,92 @@
+/* =============================================
+   woonstadNameplateForm.css
+   =============================================
+   Date: 2025-08-06
+   Last Changed: 2025-08-06
+   Description:
+   Scoped CSS for Naamplaatje aanvragen form.
+   - Matches confirmation form styling
+   - Blue header bar and bordered card
+   - Arboria for headers, Apercu Pro for content
+   ============================================= */
+
+.woonstad-form {
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid var(--ws-blue-100, #cee6f9);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    font-family: 'Apercu Pro', sans-serif;
+    max-width: 900px;
+    margin: 2rem auto;
+}
+
+/* Title styling (like confirmation form) */
+.form-title {
+    font-family: 'Arboria', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ws-blue-600, #003c80);
+    margin-bottom: 1.5rem;
+}
+
+/* Label Styling for lightning-input / combobox */
+lightning-input::part(label),
+lightning-combobox::part(label) {
+    font-size: 20px;
+    font-weight: 600;
+    font-family: 'Arboria', sans-serif;
+    color: var(--ws-text-dark, #002244);
+}
+
+/* Suggestion text */
+.suggestion-text {
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: -8px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* Inputs spacing */
+.form-input {
+    margin-bottom: 1.5rem;
+}
+
+/* Toast Styling */
+.woonstad-toast {
+    background-color: var(--ws-red-600, #d02c2c);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 16px;
+    font-family: 'Apercu Pro', sans-serif;
+    font-weight: 400;
+    animation: fadein 0.3s, fadeout 0.3s 3.7s;
+}
+
+.woonstad-toast .icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* Supplier error state */
+.input-error lightning-combobox::part(combobox) {
+    border: 2px solid var(--ws-red-600, #d02c2c);
+    border-radius: 4px;
+}
+
+/* Smooth fade */
+@keyframes fadein {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes fadeout {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}

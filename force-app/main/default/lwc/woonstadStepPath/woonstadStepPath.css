@@ -1,13 +1,15 @@
 /* =============================================
    WoonstadStepPath.css
    =============================================
-   Date: 2025-07-31
-   Last Changed: 2025-07-31
+   Date: 2025-08-06
+   Last Changed: 2025-08-06
    Description:
    Stylesheet for Woonstad Step Path component.
    - Displays branded horizontal stepper.
+   - Left-aligned inline labels.
    - Active/completed/inactive step states.
    - Tooltip above current step with fade-in effect.
+   - Bottom connecting line placed in its own row.
    ============================================= */
 
 /* =========================
@@ -15,9 +17,11 @@
    ========================= */
 .step-path-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: column; /* stack steps and line vertically */
+    align-items: flex-start; /* align to the left */
     padding: 1rem 0;
+    width: 100%;
+    position: relative;
 }
 
 /* =========================
@@ -25,33 +29,39 @@
    ========================= */
 .step-path {
     display: flex;
-    gap: 3rem;
-    justify-content: center;
+    gap: 3rem; /* spacing between steps */
+    justify-content: flex-start; /* left aligned */
     align-items: center;
-    position: relative;
-    z-index: 2;
+    width: 100%;
+    margin-bottom: 1rem; /* spacing between steps and line */
 }
 
+/* =========================
+   Step Items (circle + label inline)
+   ========================= */
 .step-item {
     display: flex;
-    flex-direction: column;
+    flex-direction: row; /* inline layout */
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
     position: relative;
+    z-index: 2;
 }
 
 /* =========================
    Step Circles
    ========================= */
 .step-circle {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 14px;
+    background-color: #d3d3d3;
+    color: #4a5568;
 }
 
 .step-circle.active {
@@ -61,7 +71,7 @@
 
 .step-circle.inactive {
     background-color: #d3d3d3;
-    color: #00215B;
+    color: #4a5568;
 }
 
 .step-circle.completed {
@@ -73,37 +83,36 @@
    Step Labels
    ========================= */
 .step-label {
-    font-size: 14px;
-    color: #00215B;
+    font-size: 15px;
+    color: #4a5568;
 }
 
 .step-label.active {
     font-weight: 700;
+    color: #00215B;
 }
 
 .step-label.inactive {
     font-weight: 400;
+    color: #7d8a9c;
 }
 
 /* =========================
-   Connecting Line
+   Connecting Line (own row)
    ========================= */
 .step-line {
-    margin-top: 0.5rem;
     width: 100%;
-    max-width: 800px;
     height: 1px;
     background-color: #d9d9d9;
-    z-index: 1;
+    position: relative; /* sits below steps */
 }
 
 /* =========================
    Custom Tooltip
    ========================= */
 .custom-tooltip {
-    position: absolute;
-    top: -4.5rem; /* above the step */
-    background-color: #003c80; /* Woonstad Dark Blue */
+    position: fixed;
+    background-color: #003c80;
     color: white;
     padding: 0.8rem 1.2rem;
     border-radius: 8px;
@@ -112,12 +121,12 @@
     min-width: 260px;
     max-width: 320px;
     text-align: center;
-    white-space: normal; /* allow wrapping */
-    z-index: 10;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    white-space: normal;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     animation: fadeIn 0.2s ease-in-out;
     line-height: 1.5;
-    pointer-events: none; /* doesn’t block hover */
+    pointer-events: none;
 }
 
 .custom-tooltip::after {
@@ -135,8 +144,8 @@
    Animation
    ========================= */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translate(-50%, -110%); }
+    to   { opacity: 1; transform: translate(-50%, -120%); }
 }
 
 /* =========================

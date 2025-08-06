@@ -2,13 +2,14 @@
  * =============================================
  * WoonstadStepPath.js
  * =============================================
- * Date: 2025-07-31
- * Last Changed: 2025-07-31
+ * Date: 2025-08-05
+ * Last Changed: 2025-08-05
  * Description:
  * Custom Step Path (progress indicator) for Woonstad flows.
  * - Renders dynamic steps from a JSON input string.
  * - Highlights current step, shows completed steps with checkmark.
  * - Displays tooltips only for the active step.
+ * - Tooltip coordinates computed in JS to avoid inline CSS parsing errors.
  */
 
 import { LightningElement, api } from 'lwc';
@@ -24,11 +25,6 @@ export default class WoonstadStepPath extends LightningElement {
 
     /**
      * API property: JSON string defining the steps.
-     * Example: 
-     * [
-     *   { "number": 1, "label": "Start", "tooltip": "Eerste stap" },
-     *   { "number": 2, "label": "Details", "tooltip": "Vul gegevens in" }
-     * ]
      */
     @api
     set jsonInput(value) {
@@ -41,7 +37,6 @@ export default class WoonstadStepPath extends LightningElement {
 
     /**
      * API property: Index of the current step (number).
-     * Updates classes to reflect active/completed state.
      */
     @api
     set currentStep(value) {
@@ -54,7 +49,6 @@ export default class WoonstadStepPath extends LightningElement {
 
     /**
      * Parse the incoming JSON string into step objects.
-     * If invalid JSON, resets the steps.
      */
     parseJson(value) {
         try {
@@ -69,9 +63,6 @@ export default class WoonstadStepPath extends LightningElement {
 
     /**
      * Updates each step’s classes and state based on currentStep.
-     * - completed: step.number < currentStep
-     * - active: step.number === currentStep
-     * - inactive: otherwise
      */
     updateStepClasses() {
         if (!Array.isArray(this._stepsRaw)) {
@@ -91,7 +82,8 @@ export default class WoonstadStepPath extends LightningElement {
                 isActive,
                 displayValue: isCompleted ? '✓' : step.number,
                 tooltip: step.tooltip || '',
-                showTooltip: false
+                showTooltip: false,
+                tooltipStyle: '' // placeholder, updated on hover
             };
         });
     }
@@ -99,14 +91,38 @@ export default class WoonstadStepPath extends LightningElement {
     /**
      * Show tooltip for the hovered step,
      * but only if it’s the active step.
+     * Computes fixed position so it always stays visible.
      */
     handleMouseOver(event) {
-        const stepId = Number(event.currentTarget.dataset.id);
-        this.steps = this.steps.map(step => ({
-            ...step,
-            showTooltip: step.number === stepId && step.number === this._currentStep
-        }));
+    const stepId = Number(event.currentTarget.dataset.id);
+    const rect = event.currentTarget.querySelector('.step-circle').getBoundingClientRect();
+
+    // Safe padding from screen edges
+    const tooltipWidth = 280; // matches CSS min-width
+    const screenPadding = 20;
+
+    // Calculate centered position
+    let left = rect.left + rect.width / 2 - tooltipWidth / 2;
+    let top = rect.top - 50;
+
+    // Clamp position so tooltip stays in viewport
+    if (left < screenPadding) {
+        left = screenPadding;
+    } else if (left + tooltipWidth > window.innerWidth - screenPadding) {
+        left = window.innerWidth - tooltipWidth - screenPadding;
     }
+
+    this.steps = this.steps.map(step => {
+        if (step.number === stepId && step.number === this._currentStep) {
+            return {
+                ...step,
+                showTooltip: true,
+                tooltipStyle: `top:${top}px; left:${left}px; width:${tooltipWidth}px;`
+            };
+        }
+        return { ...step, showTooltip: false, tooltipStyle: '' };
+    });
+}
 
     /**
      * Hide tooltip when mouse leaves the step.
@@ -114,7 +130,8 @@ export default class WoonstadStepPath extends LightningElement {
     handleMouseOut() {
         this.steps = this.steps.map(step => ({
             ...step,
-            showTooltip: false
+            showTooltip: false,
+            tooltipStyle: ''
         }));
     }
 }

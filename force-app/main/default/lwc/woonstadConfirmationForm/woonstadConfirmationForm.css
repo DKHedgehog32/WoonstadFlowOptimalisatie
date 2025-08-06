@@ -1,0 +1,76 @@
+/* =============================================
+   woonstadConfirmationForm.css
+   =============================================
+   Date: 2025-08-06
+   Last Changed: 2025-08-06
+   Description:
+   Styled confirmation form with two-column grid,
+   card outline, and red warning for missing input.
+   ============================================= */
+
+.woonstad-form {
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid var(--ws-blue-100, #cee6f9);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    font-family: 'Apercu Pro', sans-serif;
+    max-width: 900px;
+    margin: 2rem auto;
+}
+
+.form-title {
+    font-family: 'Arboria', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ws-blue-600, #003c80);
+    margin-bottom: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: minmax(200px, 280px) auto;
+    align-items: start;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    gap: 1rem;
+}
+
+.form-row:last-child {
+    border-bottom: none;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--ws-text-dark, #002244);
+    text-align: left;
+}
+
+.form-value {
+    color: var(--ws-text-dark, #002244);
+    text-align: left;
+    word-wrap: break-word;
+    white-space: normal;
+    line-height: 1.5;
+}
+
+.form-warning {
+    color: var(--ws-red-600, #d02c2c);
+    font-weight: 600;
+    text-align: left;
+    line-height: 1.4;
+}
+
+/* Responsive fallback */
+@media (max-width: 600px) {
+    .woonstad-form {
+        padding: 1rem;
+    }
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    .form-value,
+    .form-warning {
+        margin-top: 0.5rem;
+    }
+}

@@ -2,60 +2,59 @@
  * =============================================
  * WoonstadFlowQuickAction.js
  * =============================================
- * Date: 2025-08-01
- * Last Changed: 2025-08-01
+ * Date: 2025-08-06
+ * Last Changed: 2025-08-06
  * Description:
- * Legacy-style Quick Action for launching a Flow.
- * Passes recordId to the Flow and closes modal 
- * when the Flow completes.
+ * Legacy Quick Action modal.
+ * Modal controls size; Flow scales down to fit.
  */
 
 import { LightningElement, api } from 'lwc';
-import LOGO from '@salesforce/resourceUrl/WSRLogo';
 
 export default class WoonstadFlowQuickAction extends LightningElement {
-    // Record Id provided by Salesforce Quick Action
     @api recordId;
-
-    // Static resource for logo
-    logoUrl = LOGO;
-
-    connectedCallback() {
-        console.log('Quick Action launched. recordId:', this.recordId);
-    }
+    headerTitle = 'Nieuwe Zaak';
 
     renderedCallback() {
-        console.log('Rendered. recordId:', this.recordId);
+        this.autoScaleFlow();
     }
 
-    /**
-     * Getter for Flow input variables
-     */
     get flowInputs() {
-        if (this.recordId) {
-            console.log('Passing recordId into Flow:', this.recordId);
-            return [
-                {
-                    name: 'recordId',
-                    type: 'String',
-                    value: this.recordId
-                }
-            ];
-        }
-        console.warn('Flow input unavailable: recordId not set yet.');
-        return [];
+        return this.recordId
+            ? [{ name: 'recordId', type: 'String', value: this.recordId }]
+            : [];
     }
 
-    /**
-     * Handle Flow status changes
-     */
     handleStatusChange(event) {
-        const status = event.detail.status;
-        console.log('Flow status changed:', status);
+        console.log('Flow status changed:', event.detail.status);
 
-        if (status === 'FINISHED' || status === 'FINISHED_SCREEN') {
-            console.log('Flow finished, closing Quick Action modal.');
+        if (event.detail.status === 'FINISHED' || event.detail.status === 'FINISHED_SCREEN') {
             this.dispatchEvent(new CustomEvent('close'));
+        }
+    }
+
+    autoScaleFlow() {
+        try {
+            const modal = this.template.host.closest('.slds-modal__container');
+            const flowWrapper = this.template.querySelector('.flow-container');
+            if (modal && flowWrapper) {
+                const modalHeight = modal.offsetHeight;
+                const modalWidth = modal.offsetWidth;
+                const contentHeight = flowWrapper.scrollHeight;
+                const contentWidth = flowWrapper.scrollWidth;
+
+                const heightScale = modalHeight / contentHeight;
+                const widthScale = modalWidth / contentWidth;
+                const scale = Math.min(heightScale, widthScale, 1); // prevent upscale
+
+                flowWrapper.style.transform = `scale(${scale})`;
+                flowWrapper.style.width = `${100 / scale}%`;
+                flowWrapper.style.transformOrigin = 'top center';
+
+                console.log(`Flow auto-scaled with factor: ${scale}`);
+            }
+        } catch (err) {
+            console.warn('Auto-scale failed:', err);
         }
     }
 }

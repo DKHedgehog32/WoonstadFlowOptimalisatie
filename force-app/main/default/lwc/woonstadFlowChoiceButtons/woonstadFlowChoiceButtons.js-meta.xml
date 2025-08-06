@@ -1,54 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-    =============================================
-    Woonstad Flow Choice Buttons - Meta XML
-    =============================================
-    Date: 2025-07-31
-    Last Changed: 2025-07-31
-    Description:
-    Configuration file for the Woonstad Flow Choice Buttons LWC.
-    - Provides two buttons with icons:
-        * "Ik heb een aanvraag"
-        * "Ik heb een vraag"
-    - Each button sets a dedicated Flow variable and 
-      automatically moves the Flow to the next screen.
--->
-
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
-    <!-- Use current Salesforce API version -->
     <apiVersion>60.0</apiVersion>
-
-    <!-- Expose the component to Flow Screen Builder -->
     <isExposed>true</isExposed>
-
-    <!-- Metadata shown in the Flow Builder UI -->
     <masterLabel>Woonstad Flow Choice Buttons</masterLabel>
-    <description>
-        Twee knoppen met iconen die elk een aparte Flow-variabele vullen 
-        en automatisch doorgaan naar de volgende stap.
-    </description>
-
-    <!-- Allow usage inside Flow Screens only -->
+    <description>Keuzekaarten voor Flow: Naamplaatje aanvragen en Informatie vraag. Layout instelbaar (horizontal of vertical).</description>
     <targets>
         <target>lightning__FlowScreen</target>
     </targets>
-
-    <!-- Configuration for Flow properties -->
     <targetConfigs>
         <targetConfig targets="lightning__FlowScreen">
-            <!-- Output property: Aanvraag keuze -->
             <property name="var_aanvraag"
                       type="String"
-                      label="Aanvraag Variabele"
-                      role="outputOnly"
-                      description="Wordt gevuld wanneer de gebruiker kiest voor 'Ik heb een aanvraag'." />
-
-            <!-- Output property: Vraag keuze -->
+                      label="Naamplaatje aanvragen"
+                      role="outputOnly"/>
             <property name="var_vraag"
                       type="String"
-                      label="Vraag Variabele"
-                      role="outputOnly"
-                      description="Wordt gevuld wanneer de gebruiker kiest voor 'Ik heb een vraag'." />
+                      label="Informatie vraag"
+                      role="outputOnly"/>
+            <property name="layout"
+                      type="String"
+                      label="Layout"
+                      default="horizontal"
+                      description="horizontal or vertical card layout"/>
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

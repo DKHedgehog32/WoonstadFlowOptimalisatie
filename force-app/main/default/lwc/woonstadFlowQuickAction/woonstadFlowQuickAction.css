@@ -1,29 +1,59 @@
 /* =============================================
-   Woonstad Flow Quick Action Stylesheet
+   Woonstad Flow Quick Action Modal Stylesheet
    =============================================
-   Date: 2025-08-01
-   Last Changed: 2025-08-01
+   Date: 2025-08-06
+   Last Changed: 2025-08-06
    Description:
-   Styles for the Woonstad Quick Action modal.
-   Ensures blur effect and full-width header.
+   Modal leads with fixed viewport limits; Flow 
+   scales inside to avoid scrollbars.
 */
 
-/* Main modal container styling */
-.slds-modal__container {
-    background: rgba(255, 255, 255, 0.8) !important; /* Semi-transparent white */
+/* Modal container */
+:host ::deep(.slds-modal__container) {
+    background: rgba(255, 255, 255, 0.8) !important;
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+
+    width: 85vw;
+    height: 85vh;
+    max-width: 1200px;
+    max-height: 850px;
+    min-width: 60vw;
+    min-height: 50vh;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Modal content */
+:host ::deep(.slds-modal__content) {
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    flex: 1;
+}
+
+/* Flow scaling wrapper */
+.flow-scale-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
 }
 
-/* Modal content area styling */
-.slds-modal__content {
-    background: transparent !important;
-    padding: 0 !important; /* Let header/flow handle spacing */
-    border: none !important;
-    box-shadow: none !important;
+/* Flow container: scaling controlled by JS */
+.flow-container {
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    transform: scale(1);
+    transform-origin: top center;
 }
 
 /* Woonstad Header Bar */
@@ -31,7 +61,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    background-color: #0061cd; /* Woonstad Blue */
+    background-color: #0061cd;
     padding: 1rem 2rem;
     width: 100%;
     box-sizing: border-box;
@@ -40,22 +70,9 @@
     border-top-right-radius: 12px;
 }
 
-/* Logo styling */
-.woonstad-header-logo {
-    height: 32px;
-    margin-right: 1rem;
-}
-
-/* Header title styling */
+/* Header title */
 .woonstad-header-title {
     font-size: 1.4rem;
     font-weight: 600;
     margin: 0;
-}
-
-/* Flow container */
-.flow-container {
-    padding: 1rem 2rem;
-    width: 100%;
-    box-sizing: border-box;
 }

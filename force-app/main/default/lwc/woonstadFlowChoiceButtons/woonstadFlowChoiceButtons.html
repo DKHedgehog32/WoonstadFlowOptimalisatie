@@ -2,44 +2,32 @@
     =============================================
     Woonstad Flow Choice Buttons Template
     =============================================
-    Date: 2025-07-31
-    Last Changed: 2025-07-31
+    Date: 2025-08-05
+    Last Changed: 2025-08-05
     Description:
-    Lightning Web Component template for Flow Screen
-    choice buttons. Provides two options:
-      - "Ik heb een aanvraag"
-      - "Ik heb een vraag"
-    Each button updates Flow variables and navigates 
-    to the next Flow screen.
+    Flow LWC with two clickable choice cards:
+      - "Naamplaatje aanvragen"
+      - "Informatie vraag"
+    Each card updates Flow variables and navigates 
+    to the next Flow screen immediately.
 -->
 
 <template>
     <div class="button-container">
-        <!-- Button: Ik heb een aanvraag -->
-        <div class="choice-button aanvraag" onclick={handleAanvraagClick}>
-            <div class="icon-wrapper">
-                <!-- SVG icon for aanvraag -->
-                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20 3.39533L18.8151 2L16.3597 3.97933L17.5446 5.37466L20 3.39533Z" fill="#00215B"/>
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M17.4616 9.85875C17.4616 12.0664 16.5674 14.0057 14.8062 15.1283V17.3743H7.31665L7.40492 15.2119C5.6437 14.0893 4.54352 12.0664 4.54352 9.85875C4.54352 6.38313 7.43534 3.56558 11.0026 3.56558C14.5698 3.56558 17.4616 6.38313 17.4616 9.85875ZM6.40224 9.85875C6.40224 11.7592 7.61616 13.3834 9.32973 14.0354L9.13547 15.5633H12.7847L12.6754 14.0354C14.389 13.3834 15.6029 11.7592 15.6029 9.85875C15.6029 7.38331 13.5433 5.37657 11.0026 5.37657C8.46188 5.37657 6.40224 7.38331 6.40224 9.85875Z" fill="#00215B"/>
-                    <path d="M14.7665 18.0534H7.33157V20H14.7665V18.0534Z" fill="#00215B"/>
-                    <path d="M4.34547 13.7565L5.53033 15.1518L3.27402 16.9706L2.08915 15.5753L4.34547 13.7565Z" fill="#00215B"/>
-                    <path d="M16.3806 15.013L17.5654 13.6177L20 15.5802L18.8152 16.9756L16.3806 15.013Z" fill="#00215B"/>
-                    <path d="M3.18486 2.01682L2 3.41215L4.43459 5.37469L5.61946 3.97936L3.18486 2.01682Z" fill="#00215B"/>
-                </svg>
+        <!-- Naamplaatje aanvragen -->
+        <div class="choice-card" onclick={handleAanvraagClick}>
+            <div class={cardLayout}>
+                <img src={iconAanvraag} alt="Naamplaatje Icon" class="card-icon" />
+                <span class="card-label">Naamplaatje aanvragen</span>
             </div>
-            <span class="button-text">Ik heb een aanvraag</span>
         </div>
 
-        <!-- Button: Ik heb een vraag -->
-        <div class="choice-button vraag" onclick={handleVraagClick}>
-            <div class="icon-wrapper">
-                <!-- SVG icon for vraag -->
-                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19ZM11 21C5.47715 21 1 16.5228 1 11C1 5.47715 5.47715 1 11 1C16.5228 1 21 5.47715 21 11C21 16.5228 16.5228 21 11 21ZM12 16H10V10H12V16ZM11 8.5C10.1716 8.5 9.5 7.82843 9.5 7C9.5 6.17157 10.1716 5.5 11 5.5C11.8284 5.5 12.5 6.17157 12.5 7C12.5 7.82843 11.8284 8.5 11 8.5Z" fill="#00215B"/>
-                </svg>
+        <!-- Informatie vraag -->
+        <div class="choice-card" onclick={handleVraagClick}>
+            <div class={cardLayout}>
+                <img src={iconVraag} alt="Info Icon" class="card-icon" />
+                <span class="card-label">Informatie vraag</span>
             </div>
-            <span class="button-text">Ik heb een vraag</span>
         </div>
     </div>
 </template>

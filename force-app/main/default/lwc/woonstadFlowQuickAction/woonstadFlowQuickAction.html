@@ -2,30 +2,31 @@
     =============================================
     WoonstadFlowQuickAction.html
     =============================================
-    Date: 2025-08-01
-    Last Changed: 2025-08-01
+    Date: 2025-08-06
+    Last Changed: 2025-08-06
     Description:
-    Legacy-style Quick Action for launching a Flow.
-    Uses a Woonstad-styled header and lightning-card
-    (no quick-action-panel) for clean sizing.
+    Legacy Quick Action modal.
+    Modal leads with fixed size; Flow scales inside 
+    to prevent scrollbars.
 -->
 
 <template>
-    <!-- 🔵 Woonstad Blue Header -->
+    <!-- Woonstad Header -->
     <div class="woonstad-header-bar">
-        <img src={logoUrl} alt="Woonstad Rotterdam Logo" class="woonstad-header-logo" />
-        <h1 class="woonstad-header-title">Nieuwe Zaak</h1>
+        <h1 class="woonstad-header-title">{headerTitle}</h1>
     </div>
 
     <lightning-card>
         <!-- Flow container -->
         <template if:true={recordId}>
-            <div class="flow-container">
-                <lightning-flow
-                    flow-api-name="Screen_Flow_Create_Update_New_Case_V2"
-                    flow-input-variables={flowInputs}
-                    onstatuschange={handleStatusChange}>
-                </lightning-flow>
+            <div class="flow-scale-wrapper">
+                <div class="flow-container">
+                    <lightning-flow
+                        flow-api-name="Screen_Flow_Create_Update_New_Case_V2"
+                        flow-input-variables={flowInputs}
+                        onstatuschange={handleStatusChange}>
+                    </lightning-flow>
+                </div>
             </div>
         </template>
 

@@ -1,60 +1,57 @@
 /* =============================================
    Woonstad Flow Choice Buttons Stylesheet
    =============================================
-   Date: 2025-07-31
-   Last Changed: 2025-07-31
-   Description:
-   Styles for the Woonstad Flow Choice Buttons LWC.
-   Provides two large, pill-shaped buttons styled 
-   with Woonstad branding colors.
+   Ensures equal card sizes based on largest label,
+   with proper alignment and branding styling.
 */
 
-/* Container for both choice buttons */
 .button-container {
     display: flex;
-    gap: 2rem;              /* spacing between buttons */
-    justify-content: center;
+    justify-content: center; /* keep them in the center */
+    align-items: flex-start;
+    gap: 2rem; /* space between cards */
+    flex-wrap: nowrap; /* keep them side by side */
     margin-top: 2rem;
 }
 
-/* Shared styling for both buttons */
-.choice-button {
-    background-color: #85e3f9; /* Woonstad light blue */
-    border-radius: 16px;
-    width: 260px;
-    height: 180px;            /* taller to fit bigger icons */
+.choice-card {
+    background: #ffffff;
+    border: 1px solid #E0E8F6;
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    text-align: center;
-    padding: 1rem;
+    box-shadow: 4px 4px 0 #e3edfa;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 120px;
+    box-sizing: border-box;
+    width: auto;       /* width is applied by JS */
 }
 
-/* Hover state: subtle lift effect */
-.choice-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+.choice-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 6px 6px 12px rgba(0,0,0,0.1);
 }
 
-/* Wrapper for SVG icons inside the button */
-.icon-wrapper {
-    margin-bottom: 1rem;
+.card-content.horizontal {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    white-space: nowrap;
 }
 
-/* Larger, dark-blue icons */
-.icon-wrapper svg {
-    width: 40px;
-    height: 40px;
-    fill: #00215B; /* Woonstad dark blue */
+.card-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
 }
 
-/* Text label inside the button */
-.button-text {
-    font-size: 20px;
-    font-weight: bold;
-    color: #003c80; /* Woonstad dark blue */
+.card-label {
+    font-size: 1.25rem;
+    color: #00215B;
+    font-weight: 600;
 }

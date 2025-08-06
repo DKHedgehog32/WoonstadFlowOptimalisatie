@@ -1,0 +1,53 @@
+<!-- =============================================
+     woonstadConfirmationForm.html
+     =============================================
+     Date: 2025-08-06
+     Last Changed: 2025-08-06
+     Description:
+     Confirmation form displaying Flow inputs and
+     Apex outputs. Shows a red warning if 
+     Naamplaatje is missing.
+     ============================================= -->
+
+<template>
+    <div class="woonstad-form">
+        <h2 class="form-title">Controleer de gegevens</h2>
+
+        <div class="form-row">
+            <span class="form-label">Naam op het naamplaatje</span>
+            <template if:true={isNamePlateMissing}>
+                <span class="form-warning">
+                    Geen input voor Naamplaatje — ga een stap terug en vul het veld alsnog in
+                </span>
+            </template>
+            <template if:false={isNamePlateMissing}>
+                <span class="form-value">{displayNamePlate}</span>
+            </template>
+        </div>
+
+        <div class="form-row">
+            <span class="form-label">Aanvrager</span>
+            <span class="form-value">{flowInputName}</span>
+        </div>
+
+        <div class="form-row">
+            <span class="form-label">Adres</span>
+            <div class="form-value" lwc:dom="manual" data-id="addressContainer"></div>
+        </div>
+
+        <div class="form-row">
+            <span class="form-label">Reden / toelichting</span>
+            <span class="form-value">{displayReason}</span>
+        </div>
+
+        <div class="form-row">
+            <span class="form-label">Leverancier</span>
+            <span class="form-value">{flowInputSupplierName}</span>
+        </div>
+
+        <div class="form-row">
+            <span class="form-label">Eigenaar</span>
+            <span class="form-value">{eigenaar}</span>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,56 @@
+<template>
+    <div class="woonstad-form">
+        <!-- Form Header -->
+        <h2 class="form-title">Naamplaatje aanvragen</h2>
+
+        <!-- Naam op het naamplaatje (optional) -->
+        <lightning-input
+            type="text"
+            label="Naam op het naamplaatje"
+            value={nameplateName}
+            onchange={handleNameChange}
+            class={nameInputClass}>
+        </lightning-input>
+        <div class="suggestion-text" onclick={handleSuggestionClick}>
+            Suggestie: {accountName}
+        </div>
+
+        <!-- Reden van opgave -->
+        <lightning-combobox
+            name="reason"
+            label="Reden van opgave"
+            value={reason}
+            options={reasonOptions}
+            onchange={handleReasonChange}
+            class="form-input">
+        </lightning-combobox>
+
+        <!-- Leverancier -->
+        <lightning-combobox
+            name="supplier"
+            label="Leverancier"
+            value={supplierName}
+            options={supplierOptions}
+            onchange={handleSupplierChange}
+            class={supplierInputClass}>
+        </lightning-combobox>
+
+        <!-- Toelichting voor de leverancier -->
+        <lightning-input
+            type="text"
+            label="Toelichting voor de leverancier (niet verplicht)"
+            maxlength="255"
+            value={supplierNote}
+            onchange={handleNoteChange}
+            class="form-input">
+        </lightning-input>
+
+        <!-- Custom Toast -->
+        <template if:true={showToast}>
+            <div class="woonstad-toast">
+                <span class="icon">⚠️</span>
+                <span>{toastMessage}</span>
+            </div>
+        </template>
+    </div>
+</template>
